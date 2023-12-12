@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+	<meta harset="UTF-8">
+	<title>ユーザー登録</title>
+	<link rel="stylesheet" type="text/css" href="../static/css/touroku.css">
+</head>
+
+<body>
+		<h1>ユーザー登録</h1>
+		<form th:action="@{/touroku}" method="POST">
+			<div class="form-group">
+				<table>
+					
+					<tr>
+						<th>ユーザーID</th>
+						<td><input type="text" name="useID" class="textbox"></td>
+					</tr>
+					<tr>
+						<th>パスワード</th>
+						<td><input type="text" name="pass" class="textbox"></td>
+					</tr>
+					<tr>
+						<th>氏名</th>
+						<td><input type="text" name="name" class="textbox"></td>
+					</tr>
+					<tr>
+						<th>メールアドレス</th>
+						<td><input type="text" name="address" class="textbox"></td>
+					</tr>
+					
+				</table>
+					<button type="submit" class="btn btn-primary">登録</button>
+					</div>
+			</form>
+</body>
+
+</html>

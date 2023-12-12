@@ -1,0 +1,72 @@
+@charset "utf-8";
+
+/*CSSリセット*/
+html,
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+ul,
+li,
+header,
+footer,
+main,
+article,
+section,
+figure {
+    margin: 0;
+    padding: 0;
+}
+
+
+
+body {
+    text-align: center;
+    border: solid 2px #000000;
+    width: 430px;
+    height: 370px;
+    margin: 20px auto 0;
+    padding: 40px 0px;
+    margin-top: 150px;
+}
+
+h1 {
+    margin-top: 10px;
+    margin-bottom: 60px;
+}
+
+table {
+    border-collapse: collapse;
+    margin-left: 18%;
+}
+
+th {
+    border-style: solid;
+    border-width: 1px;
+    border-color: #000;
+}
+
+td {
+    border-style: solid;
+    border-width: 1px;
+    border-color: #000;
+}
+
+.textbox {
+    border: none;
+}
+
+p {
+    margin: 20px;
+}
+
+#button1 {
+    width: 100px;
+    height: 50px;
+    margin-top: 60px;
+    border-radius: 10px;
+}

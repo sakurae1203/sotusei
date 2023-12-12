@@ -1,0 +1,50 @@
+@charset "utf-8";
+
+/*CSSリセット*/
+html,
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+ul,
+li,
+header,
+footer,
+main,
+article,
+section,
+figure {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    text-align: center;
+}
+
+h1 {
+    font-size: 220%;
+    margin-top: 150px;
+}
+
+#logout {
+    margin-top: 150px;
+    width: 45%;
+    height: 40px;
+    background-color: #ff0000;
+    color: #ffffff;
+    font-weight: bold;
+    border-radius: 10px;
+}
+
+#cancel {
+    margin-top: 40px;
+    width: 45%;
+    height: 40px;
+    font-weight: bold;
+    border-radius: 10px;
+}
