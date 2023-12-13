@@ -4,13 +4,13 @@
 <head>
 	<meta harset="UTF-8">
 	<title>ユーザー登録</title>
-	<link rel="stylesheet" type="text/css" href="../static/css/touroku.css">
+	<link rel="stylesheet" href="../static/css/touroku.css" />
 </head>
 
 <body>
 		<h1>ユーザー登録</h1>
 		<form th:action="@{/touroku}" method="POST">
-			<div class="form-group">
+			<div>
 				<table>
 					
 					<tr>
@@ -27,7 +27,7 @@
 					</tr>
 					<tr>
 						<th>メールアドレス</th>
-						<td><input type="text" name="address" class="textbox"></td>
+						<td><input type="text" name="mail" class="textbox"></td>
 					</tr>
 					
 				</table>

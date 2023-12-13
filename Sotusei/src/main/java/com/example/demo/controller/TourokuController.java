@@ -1,8 +1,5 @@
 package com.example.demo.controller;
 
-import java.util.List;
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Controller;
@@ -24,12 +21,12 @@ public class TourokuController {
 
 	// 新規登録メソッド
 	@RequestMapping(path = "/touroku", method = RequestMethod.POST)
-	public String mictodo_add(int useID, String pass, String name, String mail, Model model) {
+	public String mictodo_add(String useID, String pass, String name, String mail, Model model) {
 
 		//DBに繋ぐならこんな感じ(JdbcTemplate)
-		List<Map<String, Object>> resultList = jdbcTemplate.queryForList("INSERT INTO 社員 VALUE(?,?,?,?)", useID,pass,name,mail);
+		jdbcTemplate.update("INSERT INTO 社員 VALUES (?,?,?,?);",useID,pass,name,mail);
 
-		model.addAttribute("userID", useID);
+		model.addAttribute("useID", useID);
 		model.addAttribute("password", pass);
 		model.addAttribute("name", name);
 		model.addAttribute("mail", mail);
