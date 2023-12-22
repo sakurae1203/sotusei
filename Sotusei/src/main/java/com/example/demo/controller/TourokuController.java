@@ -24,7 +24,7 @@ public class TourokuController {
 
 	// 新規登録メソッド
 	@RequestMapping(path = "/touroku", method = RequestMethod.POST)
-	public String mictodo_add(String useID, String pass, String name, String mail, Model model) {
+	public String touroku(String useID, String pass, String name, String mail, Model model) {
 
 		List<Map<String, Object>> resultList = jdbcTemplate.queryForList("SELECT * FROM 社員 WHERE userID = ?", useID);
 		
