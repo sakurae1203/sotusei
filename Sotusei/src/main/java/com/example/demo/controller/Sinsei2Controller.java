@@ -24,10 +24,10 @@ public class Sinsei2Controller {
 	
 	// 申請日登録メソッド
 	@RequestMapping(path = "/syuttaikin", params = "syukkin", method = RequestMethod.POST)
-	public String syukkin(Model model, HttpSession session) {
+	public String syukkin(String kaisi,String syuuryou,String ziyuu,Model model, HttpSession session) {
 
 		String x = (String) session.getAttribute("userID");
-		jdbcTemplate.update("INSERT INTO 有給 (workday) VALUES(CURTIME()) WHERE userID = ?;", x);
+		jdbcTemplate.update("INSERT INTO 有給 (stpaid,enpaid,detail) VALUES(?,?,?) WHERE userID = ?;",kaisi,syuuryou,ziyuu, x);
 
 		return "sinsei2";
 

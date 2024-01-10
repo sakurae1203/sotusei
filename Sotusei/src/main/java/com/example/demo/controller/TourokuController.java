@@ -31,6 +31,11 @@ public class TourokuController {
 		if (resultList.size()<1) {
 			//DBに繋ぐならこんな感じ(JdbcTemplate)
 			jdbcTemplate.update("INSERT INTO 社員 VALUES (?,?,?,?);", useID, pass, name, mail);
+			jdbcTemplate.update("INSERT INTO ワンタイム (mail) VALUES (?);", mail);
+			jdbcTemplate.update("INSERT INTO 残業時間 (userID) VALUES (?);", useID);
+			jdbcTemplate.update("INSERT INTO 出勤 (userID) VALUES (?);", useID);
+			jdbcTemplate.update("INSERT INTO 出退勤 (userID) VALUES (?);", useID);
+			jdbcTemplate.update("INSERT INTO 有給 (userID) VALUES (?);", useID);
 			return "redirect:/login1";
 		} else {
 			return "touroku";
