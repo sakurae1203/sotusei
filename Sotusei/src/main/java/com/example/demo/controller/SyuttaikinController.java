@@ -36,21 +36,23 @@ public class SyuttaikinController {
 		String over;
 		List<Map<String, Object>> resultList = jdbcTemplate.queryForList("SELECT * FROM 社員 INNER JOIN 出退勤 ON 社員.userID = 出退勤.userID;");
 		session.setAttribute("Listsize", resultList.size());
+		//セッションに値を入れて画面に一覧表みたいに表示させたい
 		for (int i = 0; i < resultList.size(); i++) {
-			ID = (List<String>) resultList.get(i).get("userID");
-			NAME = (List<String>) resultList.get(i).get("name");
-			SYUKKIN = (List<String>) resultList.get(i).get("wortime");
-			TAIKIN = (List<String>) resultList.get(i).get("closetime");
-			BREAKST = (List<String>) resultList.get(i).get("breakegins");
-			BREAKEN = (List<String>) resultList.get(i).get("breakends");
-			OVER = (List<String>) resultList.get(i).get("overtime");
-			id = ID.get(i);
-			name = NAME.get(i);
-			syukkin = SYUKKIN.get(i);
-			taikin = TAIKIN.get(i);
-			breakst = BREAKST.get(i);
-			breaken = BREAKEN.get(i);
-			over = OVER.get(i);
+			id = resultList.get(i).get("userID").toString();
+			name = resultList.get(i).get("name").toString();
+			syukkin = resultList.get(i).get("wortime").toString();
+			taikin = resultList.get(i).get("closetime").toString();
+			breakst = resultList.get(i).get("breakegins").toString();
+			breaken = resultList.get(i).get("breakends").toString();
+			over = resultList.get(i).get("overtime").toString();
+			ID.add(id);
+			NAME.add(name);
+			SYUKKIN.add(syukkin);
+			TAIKIN.add(taikin);
+			BREAKST.add(breakst);
+			BREAKEN.add(breaken);
+			OVER.add(over);
+			
 			session.setAttribute("userID", id);
 			session.setAttribute("name", name);
 			session.setAttribute("syukkin", syukkin);
@@ -58,7 +60,6 @@ public class SyuttaikinController {
 			session.setAttribute("breaktime", breakst);
 			session.setAttribute("over", over);
 		}
-
 
 		return "syuttaikin";
 	}

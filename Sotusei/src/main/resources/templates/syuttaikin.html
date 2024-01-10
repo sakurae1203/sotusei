@@ -7,7 +7,7 @@
     <link rel="stylesheet" type="text/css" href="../css/syuttaikin.css">
 </head>
 
-<body>
+<thbody>
 
     <header>
         <p id="obi">出勤・退勤</p>
@@ -38,17 +38,18 @@
 	<td>残業時間</td>
 	
 </th>
+<th>
 <?php
 for($i = 0;$i < $_SESSION["Listsize"]){
 	echo '<th>'
-	echo '<td>${session.name}';
-	echo '<td>${session.syukkin}';
-	echo '<td>${session.taikin}';
-	echo '<td>${session.breaktime}';
-	echo '<td>${session.over}';
+	echo '<td>${session.name}</td>';
+	echo '<td>${session.syukkin}</td>';
+	echo '<td>${session.taikin}</td>';
+	echo '<td>${session.breaktime}</td>';
+	echo '<td>${session.over}</td>';
 }
 ?>
-
+</th>
 
 
     <footer>
