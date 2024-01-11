@@ -2,37 +2,39 @@
 <html lang="ja">
 
 <head>
-    <meta harset="UTF-8">
-    <title>有給申請</title>
-   <!-- <link rel="stylesheet" type="text/css" href="../static/css/sinsei2.css">-->
+	<meta harset="UTF-8">
+	<title>有給申請</title>
+	<link rel="stylesheet" type="text/css" href="css/sinsei2.css">
 </head>
 
 <body>
-   <header>
-        <p id="obi">有給申請</p>
-        <input type="checkbox" id="menu">
-        <label for="menu" class="menu">
-            <span></span>
-            <span></span>
-            <span></span>
-        </label>
+	<header>
+		<p id="obi">有給申請</p>
+		<input type="checkbox" id="menu">
+		<label for="menu" class="menu">
+			<span></span>
+			<span></span>
+			<span></span>
+		</label>
 
-        <nav class="nav">
-            <ul>
-                <li><a href="./syuttaikin.html">出勤・退勤</a></li>
-                <li><a href="./nissuu.html">出勤日数</a></li>
-                <li><a href="./zangyou.html">累計残業時間</a></li>
-                <li><a href="./sinsei1.html">有給申請</a></li>
-                <li><a href="./logout.html">ログアウト</a></li>
-            </ul>
-        </nav>
-    </header>
-    <p id="hiduke"><input id="textbox" type="text" name="kaisi">～<input id="textbox" type="text" name="syuuryou"></p>
-    <p class="koumoku">事由</p>
-    <p><textarea class="ziyuu" type="text" name="ziyuu"></textarea></p>
-    <form action="./sinsei1.html">
-        <p><input type="submit" value="申請" id="sinsei"></p>
-    </form>
+		<nav class="nav">
+			<ul>
+				<li><a href="./syuttaikin.html">出勤・退勤</a></li>
+				<li><a href="./nissuu.html">出勤日数</a></li>
+				<li><a href="./zangyou.html">累計残業時間</a></li>
+				<li><a href="./sinsei1.html">有給申請</a></li>
+				<li><a href="./logout.html">ログアウト</a></li>
+			</ul>
+		</nav>
+	</header>
+	<form th:action="@{/sinsei2}" method="POST">
+		<p id="hiduke"><input id="textbox" type="text" name="kaisi">～<input id="textbox" type="text" name="syuuryou">
+		</p>
+		<p class="koumoku">事由</p>
+		<p><textarea class="ziyuu" type="text" name="ziyuu"></textarea></p>
+		<button type="submit" id="sinsei">申請</button>
+	</form>
+
 </body>
 
 </html>
