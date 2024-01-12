@@ -22,54 +22,61 @@ public class SyuttaikinController {
 
 	LocalDate day = LocalDate.now();
 
-	List<String> ID,NAME,SYUKKIN,TAIKIN,BREAKST,BREAKEN,OVER = new ArrayList<String>();
+	List<String> ID, NAME, SYUKKIN, TAIKIN, BREAKST, BREAKEN, OVER = new ArrayList<String>();
 
 	//(ページ表示用メソッド)
 	@RequestMapping(path = "/syuttaikin", method = RequestMethod.GET)
 	public String syuttaikinGet(HttpSession session) {
-		String id;
-		String name;
-		String syukkin;
-		String taikin;
-		String breakst;
-		String breaken;
-		String over;
-		List<Map<String, Object>> resultList = jdbcTemplate.queryForList("SELECT * FROM 社員 INNER JOIN 出退勤 ON 社員.userID = 出退勤.userID;");
-		session.setAttribute("Listsize", resultList.size());
-		//セッションに値を入れて画面に一覧表みたいに表示させたい
-		for (int i = 0; i < resultList.size(); i++) {
-			id = resultList.get(i).get("userID").toString();
-			name = resultList.get(i).get("name").toString();
-			syukkin = resultList.get(i).get("wortime").toString();
-			taikin = resultList.get(i).get("closetime").toString();
-			breakst = resultList.get(i).get("breakegins").toString();
-			breaken = resultList.get(i).get("breakends").toString();
-			over = resultList.get(i).get("overtime").toString();
-			ID.add(id);
-			NAME.add(name);
-			SYUKKIN.add(syukkin);
-			TAIKIN.add(taikin);
-			BREAKST.add(breakst);
-			BREAKEN.add(breaken);
-			OVER.add(over);
-			
-			session.setAttribute("userID", id);
-			session.setAttribute("name", name);
-			session.setAttribute("syukkin", syukkin);
-			session.setAttribute("taikin", taikin);
-			session.setAttribute("breaktime", breakst);
-			session.setAttribute("over", over);
-		}
+		/*	String id;
+			String name;
+			String syukkin;
+			String taikin;
+			String breakst;
+			String breaken;
+			String over;
+			List<Map<String, Object>> resultList = jdbcTemplate.queryForList("SELECT * FROM 社員 INNER JOIN 出退勤 ON 社員.userID = 出退勤.userID;");
+			session.setAttribute("Listsize", resultList.size());
+			//セッションに値を入れて画面に一覧表みたいに表示させたい
+			for (int i = 0; i < resultList.size(); i++) {
+				id = resultList.get(i).get("userID").toString();
+				name = resultList.get(i).get("name").toString();
+				syukkin = resultList.get(i).get("wortime").toString();
+				taikin = resultList.get(i).get("closetime").toString();
+				breakst = resultList.get(i).get("breakegins").toString();
+				breaken = resultList.get(i).get("breakends").toString();
+				over = resultList.get(i).get("overtime").toString();
+				ID.add(id);
+				NAME.add(name);
+				SYUKKIN.add(syukkin);
+				TAIKIN.add(taikin);
+				BREAKST.add(breakst);
+				BREAKEN.add(breaken);
+				OVER.add(over);
+				
+				session.setAttribute("userID", id);
+				session.setAttribute("name", name);
+				session.setAttribute("syukkin", syukkin);
+				session.setAttribute("taikin", taikin);
+				session.setAttribute("breaktime", breakst);
+				session.setAttribute("over", over);
+			}*/
 
 		return "syuttaikin";
 	}
 
-	// 出勤時間登録メソッド
+	/* 出勤時間登録メソッド
+	userIDと年月日を合わせて登録し出勤を一日一回までにする。*/
 	@RequestMapping(path = "/syuttaikin", params = "syukkin", method = RequestMethod.POST)
 	public String syukkin(Model model, HttpSession session) {
 
-		String x = (String) session.getAttribute("userID");
-		jdbcTemplate.update("INSERT INTO 出退勤 (workday) VALUES(CURTIME()) WHERE userID = ?;", x);
+		List<Map<String, Object>> resultList = jdbcTemplate.queryForList("SELECT CURDATE();");
+		String d = resultList.get(0).get("CURDATE()").toString();
+		//userIDの引継ぎ方がわかり次第修正
+		//String x = (String) session.getAttribute("userID");
+		String x = "12345";
+		String z = x + d;
+		//
+		jdbcTemplate.update("INSERT INTO 出退勤 (userID,date,workday) VALUES(?,?,CURTIME()) WHERE userID = ?;", x, z, x);
 
 		return "syuttaikin";
 
@@ -79,8 +86,12 @@ public class SyuttaikinController {
 	@RequestMapping(path = "/syuttaikin", params = "taikin", method = RequestMethod.POST)
 	public String taikin(Model model) {
 
-		jdbcTemplate.update("INSERT INTO 出退勤 (closetime) VALUES(CURTIME());");
-
+		List<Map<String, Object>> resultList = jdbcTemplate.queryForList("SELECT CURDATE();");
+		//String x = (String) session.getAttribute("userID");
+		String d = resultList.get(0).get("CURDATE()").toString();
+		String x = "12345";
+		String z = x + d;
+		jdbcTemplate.update("UPDATE 出退勤 SET (closetime) = CURTIME() WHERE date = ?;", z);
 		return "syuttaikin";
 
 	}
@@ -89,7 +100,12 @@ public class SyuttaikinController {
 	@RequestMapping(path = "/syuttaikin", params = "kaisi", method = RequestMethod.POST)
 	public String kaisi(Model model) {
 
-		jdbcTemplate.update("INSERT INTO 出退勤 (breakbegins) VALUES(CURTIME());");
+		List<Map<String, Object>> resultList = jdbcTemplate.queryForList("SELECT CURDATE();");
+		//String x = (String) session.getAttribute("userID");
+		String d = resultList.get(0).get("CURDATE()").toString();
+		String x = "12345";
+		String z = x + d;
+		jdbcTemplate.update("UPDATE 出退勤 SET (breakbegins) = CURTIME() WHERE date = ?;", z);
 
 		return "syuttaikin";
 
@@ -99,7 +115,12 @@ public class SyuttaikinController {
 	@RequestMapping(path = "/syuttaikin", params = "syuuryou", method = RequestMethod.POST)
 	public String syuuryou(Model model) {
 
-		jdbcTemplate.update("INSERT INTO 出退勤 (breakends) VALUES(CURTIME());");
+		List<Map<String, Object>> resultList = jdbcTemplate.queryForList("SELECT CURDATE();");
+		//String x = (String) session.getAttribute("userID");
+		String d = resultList.get(0).get("CURDATE()").toString();
+		String x = "12345";
+		String z = x + d;
+		jdbcTemplate.update("UPDATE 出退勤 SET (breakends) = CURTIME() WHERE date = ?;", z);
 
 		return "syuttaikin";
 
