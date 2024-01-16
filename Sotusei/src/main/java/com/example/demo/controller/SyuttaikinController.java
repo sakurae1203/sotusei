@@ -1,6 +1,11 @@
 package com.example.demo.controller;
 
+import java.sql.Date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +28,12 @@ public class SyuttaikinController {
 	LocalDate day = LocalDate.now();
 
 	List<String> ID, NAME, SYUKKIN, TAIKIN, BREAKST, BREAKEN, OVER = new ArrayList<String>();
+
+	int oversum = 0;
+	// 終了する時刻を指定
+	String targetTimeStr = "23:58";
+	DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+	LocalTime targetTime = LocalTime.parse(targetTimeStr, formatter);
 
 	//(ページ表示用メソッド)
 	@RequestMapping(path = "/syuttaikin", method = RequestMethod.GET)
@@ -82,16 +93,26 @@ public class SyuttaikinController {
 
 	}
 
-	//退勤時間登録メソッド
+	//退勤・残業時間登録メソッド
 	@RequestMapping(path = "/syuttaikin", params = "taikin", method = RequestMethod.POST)
-	public String taikin(Model model) {
+	public String taikin(Model model) throws ParseException {
 
 		List<Map<String, Object>> resultList = jdbcTemplate.queryForList("SELECT CURDATE();");
 		//String x = (String) session.getAttribute("userID");
 		String d = resultList.get(0).get("CURDATE()").toString();
 		String x = "12345";
 		String z = x + d;
-		jdbcTemplate.update("UPDATE 出退勤 SET (closetime) = CURTIME() WHERE date = ?;", z);
+		String targetTimeStr = "17:00:00";
+
+		SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+		Date targetTime = (Date) sdf.parse(targetTimeStr);
+		//17時から退勤時間までの時差を計算する
+		if (isTimeAfterTarget(targetTime)) {
+			jdbcTemplate.update("UPDATE 出退勤 SET closetime = CURTIME(), overtime =  WHERE date = ?;", z);
+		} else {
+			jdbcTemplate.update("UPDATE 出退勤 SET closetime = CURTIME(), overtime = 0 WHERE date = ?;", z);
+		}
+
 		return "syuttaikin";
 
 	}
@@ -105,7 +126,7 @@ public class SyuttaikinController {
 		String d = resultList.get(0).get("CURDATE()").toString();
 		String x = "12345";
 		String z = x + d;
-		jdbcTemplate.update("UPDATE 出退勤 SET (breakbegins) = CURTIME() WHERE date = ?;", z);
+		jdbcTemplate.update("UPDATE 出退勤 SET breakbegins = CURTIME() WHERE date = ?;", z);
 
 		return "syuttaikin";
 
@@ -120,10 +141,22 @@ public class SyuttaikinController {
 		String d = resultList.get(0).get("CURDATE()").toString();
 		String x = "12345";
 		String z = x + d;
-		jdbcTemplate.update("UPDATE 出退勤 SET (breakends) = CURTIME() WHERE date = ?;", z);
+		LocalTime nowtime = LocalTime.now();
+		if (nowtime.equals("17:00:00")) {
+
+		}
+		jdbcTemplate.update("UPDATE 出退勤 SET breakends = CURTIME() WHERE date = ?;", z);
 
 		return "syuttaikin";
 
 	}
 
+	//時間判定用メソッド
+	public static boolean isTimeAfterTarget(Date targetTime) {
+		LocalTime currentLocalTime = LocalTime.now();
+		LocalTime targetLocalTime = LocalTime.ofInstant(targetTime.toInstant(), java.time.ZoneId.systemDefault());
+
+		return currentLocalTime.isAfter(targetLocalTime);
+
+	}
 }
