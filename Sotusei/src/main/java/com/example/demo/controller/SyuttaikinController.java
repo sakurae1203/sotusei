@@ -1,9 +1,10 @@
 package com.example.demo.controller;
 
-import java.sql.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -86,8 +87,7 @@ public class SyuttaikinController {
 		//String x = (String) session.getAttribute("userID");
 		String x = "12345";
 		String z = x + d;
-		//
-		jdbcTemplate.update("INSERT INTO 出退勤 (userID,date,workday) VALUES(?,?,CURTIME()) WHERE userID = ?;", x, z, x);
+		jdbcTemplate.update("INSERT INTO 出退勤 (userID,date,wortime) VALUES(?,?,CURTIME());", x, z);
 
 		return "syuttaikin";
 
@@ -102,13 +102,19 @@ public class SyuttaikinController {
 		String d = resultList.get(0).get("CURDATE()").toString();
 		String x = "12345";
 		String z = x + d;
-		String targetTimeStr = "17:00:00";
+		String targetTimeStr = "10:55:00";
 
 		SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
-		Date targetTime = (Date) sdf.parse(targetTimeStr);
+		java.util.Date targetTime = sdf.parse(targetTimeStr);
 		//17時から退勤時間までの時差を計算する
 		if (isTimeAfterTarget(targetTime)) {
-			jdbcTemplate.update("UPDATE 出退勤 SET closetime = CURTIME(), overtime =  WHERE date = ?;", z);
+			LocalDateTime nowDate = LocalDateTime.now();
+			String stTime = "10:55:00";
+			String endTime = nowDate.toString();
+			java.util.Date stDate = sdf.parse(stTime);
+			java.util.Date endDate = sdf.parse(endTime);
+			long zisa = calculateTimeDifference(stDate, endDate);
+			jdbcTemplate.update("UPDATE 出退勤 SET closetime = CURTIME(), overtime = ? WHERE date = ?;", zisa, z);
 		} else {
 			jdbcTemplate.update("UPDATE 出退勤 SET closetime = CURTIME(), overtime = 0 WHERE date = ?;", z);
 		}
@@ -151,12 +157,26 @@ public class SyuttaikinController {
 
 	}
 
-	//時間判定用メソッド
-	public static boolean isTimeAfterTarget(Date targetTime) {
+	//時間超過判定メソッド
+	public static boolean isTimeAfterTarget(java.util.Date targetTime2) {
 		LocalTime currentLocalTime = LocalTime.now();
-		LocalTime targetLocalTime = LocalTime.ofInstant(targetTime.toInstant(), java.time.ZoneId.systemDefault());
+		LocalTime targetLocalTime = LocalTime.ofInstant(targetTime2.toInstant(), java.time.ZoneId.systemDefault());
 
 		return currentLocalTime.isAfter(targetLocalTime);
 
+	}
+
+	//時間差計算メソッド
+	public static long calculateTimeDifference(java.util.Date stDate, java.util.Date endDate) {
+		LocalTime stLocalTime = LocalTime.ofInstant(stDate.toInstant(), java.time.ZoneId.systemDefault());
+		LocalTime endLocalTime = LocalTime.ofInstant(endDate.toInstant(), java.time.ZoneId.systemDefault());
+
+		// 終了時刻が開始時刻より小さい場合翌日とする
+		if (endLocalTime.isBefore(stLocalTime)) {
+			endLocalTime = endLocalTime.plusHours(24);
+		}
+
+		Duration duration = Duration.between(stLocalTime, endLocalTime);
+		return duration.toMinutes();
 	}
 }

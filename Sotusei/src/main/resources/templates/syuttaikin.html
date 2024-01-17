@@ -38,25 +38,16 @@
 	<td>残業時間</td>
 	
 </th>
-<th>
-<?php
-for($i = 0;$i < $_SESSION["Listsize"]){
-	echo '<th>'
-	echo '<td>${session.name}</td>';
-	echo '<td>${session.syukkin}</td>';
-	echo '<td>${session.taikin}</td>';
-	echo '<td>${session.breaktime}</td>';
-	echo '<td>${session.over}</td>';
-}
-?>
-</th>
+
 
 
     <footer>
-        <p><input type="button" value="出勤" id="syukkin" class="button1"></p>
-        <p><input type="button" value="退勤" id="taikin" class="button1"></p>
-        <p><input type="button" value="休憩開始" id="kaisi" class="button1"></p>
-        <p><input type="button" value="休憩終了" id="syuuryou" class="button1"></p>
+		<form th:action="@{/syuttaikin}" method="POST">
+        <p><input type="submit" name="syukkin" value="出勤" id="syukkin" class="button1"></p>
+        <p><input type="submit" name="taikin" value="退勤" id="taikin" class="button1"></p>
+        <p><input type="submit" name="kaisi" value="休憩開始" id="kaisi" class="button1"></p>
+        <p><input type="submit" name="syuuryou" value="休憩終了" id="syuuryou" class="button1"></p>
+                </form>
     </footer>
 </body>
 
