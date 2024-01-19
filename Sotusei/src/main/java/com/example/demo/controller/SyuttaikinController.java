@@ -8,6 +8,8 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -29,7 +31,7 @@ public class SyuttaikinController {
 	LocalDate day = LocalDate.now();
 
 	List<String> ID, NAME, SYUKKIN, TAIKIN, BREAKST, BREAKEN, OVER = new ArrayList<String>();
-	
+
 	List<Map<String, Object>> resultList = jdbcTemplate.queryForList("SELECT CURDATE();");
 	String d = resultList.get(0).get("CURDATE()").toString();
 	//userIDの引継ぎ方がわかり次第修正
@@ -37,6 +39,8 @@ public class SyuttaikinController {
 	String x = "12345";
 	String z = x + d;
 
+	SimpleDateFormat  ymd = new SimpleDateFormat("yyyy:mm:dd");
+			
 	int oversum = 0;
 	// 終了する時刻を指定
 	String targetTimeStr = "23:58";
@@ -87,10 +91,10 @@ public class SyuttaikinController {
 	userIDと年月日を合わせて登録し出勤を一日一回までにする。*/
 	@RequestMapping(path = "/syuttaikin", params = "syukkin", method = RequestMethod.POST)
 	public String syukkin(Model model, HttpSession session) {
-		
+
 		jdbcTemplate.update("INSERT INTO 出退勤 (userID,date,wortime) VALUES(?,?,CURTIME());", x, z);
-		jdbcTemplate.update("INSERT INTO 残業時間 (date) VALUES(?);", z);
-		
+		jdbcTemplate.update("INSERT INTO 残業時間 (userID,userIDdate,date) VALUES(?,?,?);", x, z, d);
+
 		return "syuttaikin";
 
 	}
@@ -114,13 +118,23 @@ public class SyuttaikinController {
 			java.util.Date stDate = sdf.parse(stTime);
 			java.util.Date endDate = sdf.parse(endTime);
 			int zisa = (int) calculateTimeDifference(stDate, endDate);
-			String lagTime = convertMinutesToTime(zisa);
-			System.out.println(lagTime);
-			//Date lag = new SimpleDateFormat("hh:mm:ss").parse(lagTime);
-			jdbcTemplate.update("UPDATE 出退勤 SET closetime = CURTIME(), overtime = ? WHERE date = ?;", lagTime, z);
-			jdbcTemplate.update("UPDATE 残業時間 SET day = ? WHERE date = ?;", lagTime, z);
+			String lag = convertMinutesToTime(zisa);
+			//前日取得
+			Calendar zen = Calendar.getInstance();
+
+			Date now = zen.getTime();
+
+			zen.add(Calendar.DAY_OF_MONTH, -1);
+			now = zen.getTime();
+			ymd.format(now);
+			String daybefore = now.toString();
+			List<Map<String, Object>> zangyouList = jdbcTemplate.queryForList("SELECT * FROM 残業時間 WHERE date = ?;", z);
+			int h = (int) zangyouList.get(0).get("week");
+			jdbcTemplate.update("UPDATE 出退勤 SET closetime = CURTIME(), overtime = ? WHERE date = ?;", lag, z);
+			jdbcTemplate.update("UPDATE 残業時間 SET day = ? WHERE userIDdate = ?;", zisa, z);
 		} else {
 			jdbcTemplate.update("UPDATE 出退勤 SET closetime = CURTIME(), overtime = 0 WHERE date = ?;", z);
+			jdbcTemplate.update("UPDATE 残業時間 SET day = 0 WHERE userIDdate = ?;", z);
 		}
 
 		return "syuttaikin";
@@ -140,7 +154,7 @@ public class SyuttaikinController {
 	//休憩終了時間登録メソッド
 	@RequestMapping(path = "/syuttaikin", params = "syuuryou", method = RequestMethod.POST)
 	public String syuuryou(Model model) {
-		
+
 		LocalTime nowtime = LocalTime.now();
 		if (nowtime.equals("17:00:00")) {
 
@@ -170,20 +184,20 @@ public class SyuttaikinController {
 			endLocalTime = endLocalTime.plusHours(24);
 		}
 
-	    Duration duration = Duration.between(stLocalTime, endLocalTime);
-	    double secondsDifference = duration.toMillis() / 1000.0;
+		Duration duration = Duration.between(stLocalTime, endLocalTime);
+		double secondsDifference = duration.toMillis() / 1000.0;
 
-	    //return minutesDifference; // 分単位での差
-	    return secondsDifference; // 秒単位での差
+		//return minutesDifference; // 分単位での差
+		return secondsDifference; // 秒単位での差
 	}
 
 	public static String convertMinutesToTime(long zisa) {
-		// 分を時間、分、秒に変換
+		// 秒を時間、分、秒に変換
 		long hou = zisa / 3600;
 		long min = zisa % 3600 / 60;
 		long sec = zisa % 60;
 
 		// 時刻形式に変換して文字列として返す
-		return String.format("%02d:%02d:%02d", hou,min,sec);
+		return String.format("%02d:%02d:%02d", hou, min, sec);
 	}
 }
