@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import java.sql.Time;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
@@ -123,6 +124,15 @@ public class SyuttaikinController {
 			int zisa = (int) calculateTimeDifference(stDate, endDate);
 			String lagwhile = convertMinutesToTime(zisa);
 			int lag = Integer.parseInt(lagwhile);
+			int hou = zisa / 3600;
+			int min = zisa % 3600 / 60;
+			int sec = zisa % 60;
+			System.out.println(zisa);
+			System.out.println(lagwhile);
+			System.out.println(lag);
+			System.out.println(hou);
+			System.out.println(min);
+			System.out.println(sec);
 			//前日取得
 			Calendar zen = Calendar.getInstance();
 
@@ -132,38 +142,55 @@ public class SyuttaikinController {
 			now = zen.getTime();
 			String bday = sdf1.format(now);
 			String a = x + bday;
-			System.out.println(a);
 			//週月年にその日の残業時間を足していく
-			List<Map<String, Object>> zangyouList = jdbcTemplate.queryForList("SELECT * FROM 残業時間 WHERE date = ?;", a);
-			Date bwe = (Date) zangyouList.get(0).get("week");
-			Calendar cal = Calendar.getInstance();
-			cal.setTime(bwe);
+			List<Map<String, Object>> zangyouList = jdbcTemplate.queryForList("SELECT * FROM 残業時間 WHERE userIDdate = ?;", a);
+	        Time sqlTime = (Time) zangyouList.get(0).get("week");
 
-			cal.add(Calendar.HOUR_OF_DAY, lag);
+	        // SQL TimeからLocalTimeに変換
+	        LocalTime localTime = sqlTime.toLocalTime();
 
-			Date we = cal.getTime();
+	        // LocalTimeを使用してLocalDateTimeを作成（日付部分は任意の値を使用）
+	        LocalDateTime bwe = LocalDateTime.of(2024, 1, 1, localTime.getHour(), localTime.getMinute(), localTime.getSecond());
+
+			LocalDateTime oneLater = bwe.plusHours(hou);
+			oneLater = oneLater.plusMinutes(min);
+			oneLater = oneLater.plusSeconds(sec);
+
+			LocalDateTime we = oneLater;
 			System.out.println(we);
 
-			Date bmo = (Date) zangyouList.get(0).get("month");
-			cal = Calendar.getInstance();
-			cal.setTime(bmo);
+	        sqlTime = (Time) zangyouList.get(0).get("month");
 
-			cal.add(Calendar.HOUR_OF_DAY, lag);
+	        // SQL TimeからLocalTimeに変換
+	        localTime = sqlTime.toLocalTime();
 
-			Date mo = cal.getTime();
+	        // LocalTimeを使用してLocalDateTimeを作成（日付部分は任意の値を使用）
+	        LocalDateTime bmo = LocalDateTime.of(2024, 1, 1, localTime.getHour(), localTime.getMinute(), localTime.getSecond());
+
+			oneLater = bmo.plusHours(hou);
+			oneLater = oneLater.plusMinutes(min);
+			oneLater = oneLater.plusSeconds(sec);
+
+			LocalDateTime mo = oneLater;
 			System.out.println(mo);
 
-			Date bye = (Date) zangyouList.get(0).get("year");
-			cal = Calendar.getInstance();
-			cal.setTime(bye);
+	        sqlTime = (Time) zangyouList.get(0).get("year");
 
-			cal.add(Calendar.HOUR_OF_DAY, lag);
+	        // SQL TimeからLocalTimeに変換
+	        localTime = sqlTime.toLocalTime();
 
-			Date ye = cal.getTime();
+	        // LocalTimeを使用してLocalDateTimeを作成（日付部分は任意の値を使用）
+	        LocalDateTime bye = LocalDateTime.of(2024, 1, 1, localTime.getHour(), localTime.getMinute(), localTime.getSecond());
+
+			oneLater = bye.plusHours(hou);
+			oneLater = oneLater.plusMinutes(min);
+			oneLater = oneLater.plusSeconds(sec);
+
+			LocalDateTime ye = oneLater;
 			System.out.println(ye);
 			//退勤時間・残業時間登録
 			jdbcTemplate.update("UPDATE 出退勤 SET closetime = CURTIME(), overtime = ? WHERE date = ?;", lag, z);
-			jdbcTemplate.update("UPDATE 残業時間 SET day = ?, week = ?, month = ?, year = ? WHERE userIDdate = ?;", zisa, we, mo, ye, z);
+			jdbcTemplate.update("UPDATE 残業時間 SET day = ?, week = ?, month = ?, year = ? WHERE userIDdate = ?;", lagwhile, we, mo, ye, z);
 		} else {
 			//前日取得
 			Calendar zen = Calendar.getInstance();
