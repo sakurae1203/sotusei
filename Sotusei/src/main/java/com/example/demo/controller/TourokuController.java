@@ -1,5 +1,7 @@
 package com.example.demo.controller;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -29,10 +31,15 @@ public class TourokuController {
 		List<Map<String, Object>> resultList = jdbcTemplate.queryForList("SELECT * FROM 社員 WHERE userID = ?", useID);
 		
 		if (resultList.size()<1) {
+			Calendar zen = Calendar.getInstance();
+
+			Date now = zen.getTime();
+
+			zen.add(Calendar.DAY_OF_MONTH, -1);
 			//DBに繋ぐならこんな感じ(JdbcTemplate)
 			jdbcTemplate.update("INSERT INTO 社員 VALUES (?,?,?,?);", useID, pass, name, mail);
 			jdbcTemplate.update("INSERT INTO ワンタイム VALUES (?,?);", mail,0);
-			jdbcTemplate.update("INSERT INTO 残業時間 VALUES (?,?,?,?,?);", useID,0,0,0,0);
+			jdbcTemplate.update("INSERT INTO 残業時間 (useID, day, week, month, year VALUES (?,?,?,?,?);", useID,0,0,0,0);
 			jdbcTemplate.update("INSERT INTO 出勤 VALUES (?,?,?,?);", useID,0,0,0);
 			jdbcTemplate.update("INSERT INTO 出退勤 VALUES (?,?,?,?,?,?,?);", useID,0,0,0,0,0,0);
 			return "redirect:/login1";
