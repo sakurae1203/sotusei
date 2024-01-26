@@ -1,5 +1,8 @@
 package com.example.demo.controller;
 
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Controller;
@@ -29,6 +32,14 @@ public class Sinsei2Controller {
 		String x = "12345";
 		jdbcTemplate.update("INSERT INTO 有給 (userID,stpaid,enpaid,detail,yearpaid,totalpaid,con) VALUES(?,?,?,?,?,?,?);", x, kaisi, syuuryou, ziyuu,0,0,0);
 
+		List<Map<String, Object>> result = jdbcTemplate.queryForList("SELECT COUNT(*) FROM 有給 WHERE userID = ?;",x);
+		
+		String npl = String.valueOf(result.get(0).get("COUNT(*)"));
+		
+		jdbcTemplate.update("UPDATE 有給 SET totalpaid = ? WHERE userID = ?;", npl, x);
+		
+		jdbcTemplate.update("UPDATE 出勤 SET paid = ? WHERE userID = ?;", npl, x);
+		
 		//return "redirect:/sinsei1";
 		return "sinsei2";
 	}

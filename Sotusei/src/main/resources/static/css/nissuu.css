@@ -22,6 +22,12 @@ figure {
     padding: 0;
 }
 
+#hanbaga {
+    position: relative;
+    z-index: 100000;
+
+}
+
 .menu {
 
     position: fixed;

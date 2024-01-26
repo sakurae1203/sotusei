@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -31,15 +32,23 @@ public class TourokuController {
 		List<Map<String, Object>> resultList = jdbcTemplate.queryForList("SELECT * FROM 社員 WHERE userID = ?", useID);
 		
 		if (resultList.size()<1) {
+			
+			Date nD = new Date();
+		    SimpleDateFormat sdf1
+		    = new SimpleDateFormat("yyyy/MM/dd");
+		    String d = sdf1.format(nD);
 			Calendar zen = Calendar.getInstance();
 
 			Date now = zen.getTime();
 
 			zen.add(Calendar.DAY_OF_MONTH, -1);
+			now = zen.getTime();
+			String bday = sdf1.format(now);
+			
 			//DBに繋ぐならこんな感じ(JdbcTemplate)
 			jdbcTemplate.update("INSERT INTO 社員 VALUES (?,?,?,?);", useID, pass, name, mail);
 			jdbcTemplate.update("INSERT INTO ワンタイム VALUES (?,?);", mail,0);
-			jdbcTemplate.update("INSERT INTO 残業時間 (useID, day, week, month, year VALUES (?,?,?,?,?);", useID,0,0,0,0);
+			jdbcTemplate.update("INSERT INTO 残業時間 (useID, userIDdate, day, week, month, year) VALUES (?,?,?,?,?,?);", useID,useID+bday,0,0,0,0);
 			jdbcTemplate.update("INSERT INTO 出勤 VALUES (?,?,?,?);", useID,0,0,0);
 			jdbcTemplate.update("INSERT INTO 出退勤 VALUES (?,?,?,?,?,?,?);", useID,0,0,0,0,0,0);
 			return "redirect:/login1";

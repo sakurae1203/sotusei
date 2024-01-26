@@ -29,9 +29,8 @@ public class SyuttaikinController {
 	//List<String> ID, NAME, SYUKKIN, TAIKIN, BREAKST, BREAKEN, OVER = new ArrayList<String>();
 
 	Date nD = new Date();
-    SimpleDateFormat sdf1
-    = new SimpleDateFormat("yyyy/MM/dd");
-    String d = sdf1.format(nD);
+	SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy/MM/dd");
+	String d = sdf1.format(nD);
 	//userIDの引継ぎ方がわかり次第修正
 	//String x = (String) session.getAttribute("userID");
 	String x = "12345";
@@ -91,7 +90,7 @@ public class SyuttaikinController {
 	@RequestMapping(path = "/syuttaikin", params = "syukkin", method = RequestMethod.POST)
 	public String syukkin() {
 
-		jdbcTemplate.update("INSERT INTO 出退勤 (userID,date,wortime) VALUES(?,?,CURTIME());", x, z);
+		jdbcTemplate.update("INSERT INTO 出退勤 (userID, day, date,wortime) VALUES(?,?,?,CURTIME());", x, d, z);
 		jdbcTemplate.update("INSERT INTO 残業時間 (userID,userIDdate,date) VALUES(?,?,?);", x, z, d);
 		/*jdbcTemplate.update("INSERT INTO 出勤 (userID) VALUES(?);", x);
 		jdbcTemplate.update("INSERT INTO 有給 (userID) VALUES(?);", x);*/
@@ -143,54 +142,56 @@ public class SyuttaikinController {
 			String bday = sdf1.format(now);
 			String a = x + bday;
 			//週月年にその日の残業時間を足していく
-			List<Map<String, Object>> zangyouList = jdbcTemplate.queryForList("SELECT * FROM 残業時間 WHERE userIDdate = ?;", a);
-	        Time sqlTime = (Time) zangyouList.get(0).get("week");
+			List<Map<String, Object>> zangyouList = jdbcTemplate
+					.queryForList("SELECT * FROM 残業時間 WHERE userIDdate = ?;", a);
+			Time sqlTime = (Time) zangyouList.get(0).get("week");
 
-	        // SQL TimeからLocalTimeに変換
-	        LocalTime localTime = sqlTime.toLocalTime();
+			// SQL TimeからLocalTimeに変換
+			LocalTime localTime = sqlTime.toLocalTime();
 
-	        // LocalTimeを使用してLocalDateTimeを作成（日付部分は任意の値を使用）
-	        LocalDateTime bwe = LocalDateTime.of(2024, 1, 1, localTime.getHour(), localTime.getMinute(), localTime.getSecond());
+			// LocalTimeを使用してLocalDateTimeを作成（日付部分は任意の値を使用）
+			LocalDateTime bwe = LocalDateTime.of(2024, 1, 1, localTime.getHour(), localTime.getMinute(),
+					localTime.getSecond());
 
 			LocalDateTime oneLater = bwe.plusHours(hou);
 			oneLater = oneLater.plusMinutes(min);
 			oneLater = oneLater.plusSeconds(sec);
 
 			LocalDateTime we = oneLater;
-			System.out.println(we);
 
-	        sqlTime = (Time) zangyouList.get(0).get("month");
+			sqlTime = (Time) zangyouList.get(0).get("month");
 
-	        // SQL TimeからLocalTimeに変換
-	        localTime = sqlTime.toLocalTime();
+			// SQL TimeからLocalTimeに変換
+			localTime = sqlTime.toLocalTime();
 
-	        // LocalTimeを使用してLocalDateTimeを作成（日付部分は任意の値を使用）
-	        LocalDateTime bmo = LocalDateTime.of(2024, 1, 1, localTime.getHour(), localTime.getMinute(), localTime.getSecond());
+			// LocalTimeを使用してLocalDateTimeを作成（日付部分は任意の値を使用）
+			LocalDateTime bmo = LocalDateTime.of(2024, 1, 1, localTime.getHour(), localTime.getMinute(),
+					localTime.getSecond());
 
 			oneLater = bmo.plusHours(hou);
 			oneLater = oneLater.plusMinutes(min);
 			oneLater = oneLater.plusSeconds(sec);
 
 			LocalDateTime mo = oneLater;
-			System.out.println(mo);
 
-	        sqlTime = (Time) zangyouList.get(0).get("year");
+			sqlTime = (Time) zangyouList.get(0).get("year");
 
-	        // SQL TimeからLocalTimeに変換
-	        localTime = sqlTime.toLocalTime();
+			// SQL TimeからLocalTimeに変換
+			localTime = sqlTime.toLocalTime();
 
-	        // LocalTimeを使用してLocalDateTimeを作成（日付部分は任意の値を使用）
-	        LocalDateTime bye = LocalDateTime.of(2024, 1, 1, localTime.getHour(), localTime.getMinute(), localTime.getSecond());
+			// LocalTimeを使用してLocalDateTimeを作成（日付部分は任意の値を使用）
+			LocalDateTime bye = LocalDateTime.of(2024, 1, 1, localTime.getHour(), localTime.getMinute(),
+					localTime.getSecond());
 
 			oneLater = bye.plusHours(hou);
 			oneLater = oneLater.plusMinutes(min);
 			oneLater = oneLater.plusSeconds(sec);
 
 			LocalDateTime ye = oneLater;
-			System.out.println(ye);
 			//退勤時間・残業時間登録
 			jdbcTemplate.update("UPDATE 出退勤 SET closetime = CURTIME(), overtime = ? WHERE date = ?;", lag, z);
-			jdbcTemplate.update("UPDATE 残業時間 SET day = ?, week = ?, month = ?, year = ? WHERE userIDdate = ?;", lagwhile, we, mo, ye, z);
+			jdbcTemplate.update("UPDATE 残業時間 SET day = ?, week = ?, month = ?, year = ? WHERE userIDdate = ?;",
+					lagwhile, we, mo, ye, z);
 		} else {
 			//前日取得
 			Calendar zen = Calendar.getInstance();
@@ -199,16 +200,37 @@ public class SyuttaikinController {
 
 			zen.add(Calendar.DAY_OF_MONTH, -1);
 			now = zen.getTime();
-			ymd.format(now);
-			String daybefore = now.toString();
-			String a = x + daybefore;
-			List<Map<String, Object>> zangyouList = jdbcTemplate.queryForList("SELECT * FROM 残業時間 WHERE date = ?;", a);
-			Date bwe = (Date) zangyouList.get(0).get("week");
-			Date bmo = (Date) zangyouList.get(0).get("month");
-			Date bye = (Date) zangyouList.get(0).get("year");
+			String bday = sdf1.format(now);
+			String a = x + bday;
+			List<Map<String, Object>> zangyouList = jdbcTemplate
+					.queryForList("SELECT * FROM 残業時間 WHERE userIDdate = ?;", a);
+			Time sqlTime = (Time) zangyouList.get(0).get("week");
+
+			// SQL TimeからLocalTimeに変換
+			LocalTime localTime = sqlTime.toLocalTime();
+
+			// LocalTimeを使用してLocalDateTimeを作成（日付部分は任意の値を使用）
+			LocalDateTime bwe = LocalDateTime.of(2024, 1, 1, localTime.getHour(), localTime.getMinute(),
+					localTime.getSecond());
+			sqlTime = (Time) zangyouList.get(0).get("month");
+
+			// SQL TimeからLocalTimeに変換
+			localTime = sqlTime.toLocalTime();
+
+			// LocalTimeを使用してLocalDateTimeを作成（日付部分は任意の値を使用）
+			LocalDateTime bmo = LocalDateTime.of(2024, 1, 1, localTime.getHour(), localTime.getMinute(),
+					localTime.getSecond());
+			sqlTime = (Time) zangyouList.get(0).get("year");
+
+			// SQL TimeからLocalTimeに変換
+			localTime = sqlTime.toLocalTime();
+
+			// LocalTimeを使用してLocalDateTimeを作成（日付部分は任意の値を使用）
+			LocalDateTime bye = LocalDateTime.of(2024, 1, 1, localTime.getHour(), localTime.getMinute(),
+					localTime.getSecond());
 			//残業してない場合はその日に0、週月年に前日の値を入れる
 			jdbcTemplate.update("UPDATE 出退勤 SET closetime = CURTIME(), overtime = 0 WHERE date = ?;", z);
-			jdbcTemplate.update("UPDATE 残業時間 SET day = 0, week = ?, month = ?, year = ? WHERE userIDdate = ?;", bwe, bmo, bye, z);
+			jdbcTemplate.update("UPDATE 残業時間 SET day = 0, week = ?, month = ?, year = ? WHERE userIDdate = ?;", bwe,bmo, bye, z);
 		}
 
 		return "syuttaikin";
