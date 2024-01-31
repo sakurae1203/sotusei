@@ -92,8 +92,8 @@ public class SyuttaikinController {
 
 		jdbcTemplate.update("INSERT INTO 出退勤 (userID, day, date,wortime) VALUES(?,?,?,CURTIME());", x, d, z);
 		jdbcTemplate.update("INSERT INTO 残業時間 (userID,userIDdate,date) VALUES(?,?,?);", x, z, d);
-		/*jdbcTemplate.update("INSERT INTO 出勤 (userID) VALUES(?);", x);
-		jdbcTemplate.update("INSERT INTO 有給 (userID) VALUES(?);", x);*/
+		//jdbcTemplate.update("INSERT INTO 出勤 (userID) VALUES(?);", x);
+		jdbcTemplate.update("INSERT INTO 有給 VALUES(?,?,?,?,?,?,?);", x, 20,0,0,0,0,0);
 
 		return "syuttaikin";
 
@@ -102,9 +102,12 @@ public class SyuttaikinController {
 	//退勤・残業時間登録メソッド
 	@RequestMapping(path = "/syuttaikin", params = "taikin", method = RequestMethod.POST)
 	public String taikin() throws ParseException {
+		
+		//定時設定
+		String teizi = "10:29:00";
 
 		//残業開始判定時間
-		String targetTimeStr = "10:29:00";
+		String targetTimeStr = teizi;
 
 		SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
 		java.util.Date targetTime = sdf.parse(targetTimeStr);
@@ -116,7 +119,7 @@ public class SyuttaikinController {
 			//SimpleDateFormat DateFormat = new SimpleDateFormat("HH:mm:ss");
 			String formatNowDate = dtf1.format(nowDate);
 			//残業時間計算
-			String stTime = "10:29:00";
+			String stTime = teizi;
 			String endTime = formatNowDate.toString();
 			java.util.Date stDate = sdf.parse(stTime);
 			java.util.Date endDate = sdf.parse(endTime);

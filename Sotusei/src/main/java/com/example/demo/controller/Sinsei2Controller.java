@@ -30,13 +30,24 @@ public class Sinsei2Controller {
 
 		//String x = (String) session.getAttribute("userID");
 		String x = "12345";
+		
+		//出勤日数カウント
+		List<Map<String, Object>> resultnissuu = jdbcTemplate.queryForList("SELECT COUNT(*) FROM 出退勤 GROUP BY userID;");
+			String nwd = String.valueOf(resultnissuu.get(0).get("COUNT(*)"));
+		
 		jdbcTemplate.update("INSERT INTO 有給 (userID,stpaid,enpaid,detail,yearpaid,totalpaid,con) VALUES(?,?,?,?,?,?,?);", x, kaisi, syuuryou, ziyuu,0,0,0);
 
 		List<Map<String, Object>> result = jdbcTemplate.queryForList("SELECT COUNT(*) FROM 有給 WHERE userID = ?;",x);
 		
 		String npl = String.valueOf(result.get(0).get("COUNT(*)"));
 		
-		jdbcTemplate.update("UPDATE 有給 SET totalpaid = ? WHERE userID = ?;", npl, x);
+		List<Map<String, Object>> resultList = jdbcTemplate.queryForList("SELECT * FROM 有給 WHERE userID = ?;",x);
+		
+		int year = Integer.parseInt((String) resultList.get(0).get("yearpaid"));
+		year = year - Integer.parseInt(npl) + Integer.parseInt(nwd);
+		System.out.println(year);
+		
+		jdbcTemplate.update("UPDATE 有給 SET yearpaid = ?, totalpaid = ? WHERE userID = ?;", year, npl, x);
 		
 		jdbcTemplate.update("UPDATE 出勤 SET paid = ? WHERE userID = ?;", npl, x);
 		

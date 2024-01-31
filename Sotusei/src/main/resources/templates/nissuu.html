@@ -2,34 +2,47 @@
 <html lang="ja">
 
 <head>
-    <meta harset="UTF-8">
-    <title>出勤日数</title>
-    <link rel="stylesheet" type="text/css" href="../css/nissuu.css">
+	<meta harset="UTF-8">
+	<title>出勤日数</title>
+	<link rel="stylesheet" type="text/css" href="../css/nissuu.css">
 </head>
 
 <body>
 
-    <header>
-        <p id="obi">出勤日数</p>
-        <div id="hanbaga">
-            <input type="checkbox" id="menu">
-            <label for="menu" class="menu">
-                <span></span>
-                <span></span>
-                <span></span>
-            </label>
+	<header>
+		<p id="obi">出勤日数</p>
+		<div id="hanbaga">
+			<input type="checkbox" id="menu">
+			<label for="menu" class="menu">
+				<span></span>
+				<span></span>
+				<span></span>
+			</label>
 
-            <nav class="nav">
-                <ul>
-                    <li><a href="./syuttaikin.html">出勤・退勤</a></li>
-                    <li><a href="./nissuu.html">出勤日数</a></li>
-                    <li><a href="./zangyou.html">累計残業時間</a></li>
-                    <li><a href="./sinsei1.html">有給申請</a></li>
-                    <li><a href="./logout.html">ログアウト</a></li>
-                </ul>
-            </nav>
-    </header>
-    </div>
+			<nav class="nav">
+				<ul>
+					<li><a href="./syuttaikin.html">出勤・退勤</a></li>
+					<li><a href="./nissuu.html">出勤日数</a></li>
+					<li><a href="./zangyou.html">累計残業時間</a></li>
+					<li><a href="./sinsei1.html">有給申請</a></li>
+					<li><a href="./logout.html">ログアウト</a></li>
+				</ul>
+			</nav>
+	</header>
+	</div>
+
+<!--	<table>
+		<th>氏名</th>
+		<th>出勤日数</th>
+		<th>有給残数</th>
+		<th>欠勤日数</th>
+		<tr th:each="result : ${resultList}">
+			<td th:text="${result.name}"></td>
+			<td th:text="${result.workday}"></td>
+			<td th:text="${result.paid}"></td>
+			<td th:text="${result.adsent}"></td>
+		</tr>
+	</table> -->
 
 </body>
 
