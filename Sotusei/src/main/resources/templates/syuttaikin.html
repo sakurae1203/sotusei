@@ -2,53 +2,65 @@
 <html lang="ja">
 
 <head>
-    <meta harset="UTF-8">
-    <title>出退勤</title>
-    <link rel="stylesheet" type="text/css" href="../css/syuttaikin.css">
+	<meta harset="UTF-8">
+	<title>出退勤</title>
+	<link rel="stylesheet" type="text/css" href="../css/syuttaikin.css">
 </head>
 
 <thbody>
 
-    <header>
-        <p id="obi">出勤・退勤</p>
-        <div id="hanbaga">
-            <input type="checkbox" id="menu">
-            <label for="menu" class="menu">
-                <span></span>
-                <span></span>
-                <span></span>
-            </label>
+	<header>
+		<p id="obi">出勤・退勤</p>
+		<div id="hanbaga">
+			<input type="checkbox" id="menu">
+			<label for="menu" class="menu">
+				<span></span>
+				<span></span>
+				<span></span>
+			</label>
 
-            <nav class="nav">
-                <ul>
-                    <li><a href="./syuttaikin.html">出勤・退勤</a></li>
-                    <li><a href="./nissuu.html">出勤日数</a></li>
-                    <li><a href="./zangyou.html">累計残業時間</a></li>
-                    <li><a href="./sinsei1.html">有給申請</a></li>
-                    <li><a href="./logout.html">ログアウト</a></li>
-                </ul>
-            </nav>
-    </header>
-    </div>
-<th>
-	<td>氏名</td>
-	<td>出勤時間</td>
-	<td>退勤時間</td>
-	<td>休憩時間</td>
-	<td>残業時間</td>
-	
-</th>
+			<nav class="nav">
+				<ul>
+					<li><a href="./syuttaikin.html">出勤・退勤</a></li>
+					<li><a href="./nissuu.html">出勤日数</a></li>
+					<li><a href="./zangyou.html">累計残業時間</a></li>
+					<li><a href="./sinsei1.html">有給申請</a></li>
+					<li><a href="./logout.html">ログアウト</a></li>
+				</ul>
+			</nav>
+	</header>
+	</div>
+
+			
+				<table class="table_design08">
+		<thead>
+			<th>氏名</th>
+			<th>出勤時間</th>
+			<th>退勤時間</th>
+			<th>休憩時間</th>
+			<th>残業時間</th>
+		</thead>
+		<tbody>
+			<tr th:each="result : ${resultList}">
+				<td th:text="${result.name}"></td>
+				<td th:text="${result.wortime}"></td>
+				<td th:text="${result.closetime}"></td>
+				<td th:text="${result.breakbegins}"></td>
+				<td th:text="${result.overtime}"></td>
+			</tr>
+		</tbody>
+	</table>
 
 
 
-    <footer>
-		<form th:action="@{/syuttaikin}" method="POST">
-        <p><input type="submit" name="syukkin" value="出勤" id="syukkin" class="button1"></p>
-        <p><input type="submit" name="taikin" value="退勤" id="taikin" class="button1"></p>
-        <p><input type="submit" name="kaisi" value="休憩開始" id="kaisi" class="button1"></p>
-        <p><input type="submit" name="syuuryou" value="休憩終了" id="syuuryou" class="button1"></p>
-                </form>
-    </footer>
-</body>
+			<footer>
+				<form th:action="@{/syuttaikin}" method="POST">
+					<p><input type="submit" name="syukkin" value="出勤" id="syukkin" class="button1"></p>
+					<p><input type="submit" name="taikin" value="退勤" id="taikin" class="button1"></p>
+					<p><input type="submit" name="kaisi" value="休憩開始" id="kaisi" class="button1"></p>
+					<p><input type="submit" name="syuuryou" value="休憩終了" id="syuuryou" class="button1"></p>
+				</form>
+			</footer>
+			</body>
 
 </html>

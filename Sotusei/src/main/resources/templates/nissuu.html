@@ -31,18 +31,22 @@
 	</header>
 	</div>
 
-<!--	<table>
-		<th>氏名</th>
-		<th>出勤日数</th>
-		<th>有給残数</th>
-		<th>欠勤日数</th>
-		<tr th:each="result : ${resultList}">
-			<td th:text="${result.name}"></td>
-			<td th:text="${result.workday}"></td>
-			<td th:text="${result.paid}"></td>
-			<td th:text="${result.adsent}"></td>
-		</tr>
-	</table> -->
+	<table class="table_design08">
+		<thead>
+			<th>氏名</th>
+			<th>出勤日数</th>
+			<th>有給残数</th>
+			<th>欠勤日数</th>
+		</thead>
+		<tbody>
+			<tr th:each="result : ${resultList}">
+				<td th:text="${result.name}"></td>
+				<td th:text="${result.workday}"></td>
+				<td th:text="${result.yearpaid}"></td>
+				<td th:text="${result.adsent}"></td>
+			</tr>
+		</tbody>
+	</table>
 
 </body>
 

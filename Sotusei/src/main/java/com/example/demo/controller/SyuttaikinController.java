@@ -15,6 +15,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -46,41 +47,13 @@ public class SyuttaikinController {
 
 	//(ページ表示用メソッド)
 	@RequestMapping(path = "/syuttaikin", method = RequestMethod.GET)
-	public String syuttaikinGet() {
-		//HttpSession session
-		/*	String id;
-			String name;
-			String syukkin;
-			String taikin;
-			String breakst;
-			String breaken;
-			String over;
-			List<Map<String, Object>> resultList = jdbcTemplate.queryForList("SELECT * FROM 社員 INNER JOIN 出退勤 ON 社員.userID = 出退勤.userID;");
-			session.setAttribute("Listsize", resultList.size());
-			//セッションに値を入れて画面に一覧表みたいに表示させたい
-			for (int i = 0; i < resultList.size(); i++) {
-				id = resultList.get(i).get("userID").toString();
-				name = resultList.get(i).get("name").toString();
-				syukkin = resultList.get(i).get("wortime").toString();
-				taikin = resultList.get(i).get("closetime").toString();
-				breakst = resultList.get(i).get("breakegins").toString();
-				breaken = resultList.get(i).get("breakends").toString();
-				over = resultList.get(i).get("overtime").toString();
-				ID.add(id);
-				NAME.add(name);
-				SYUKKIN.add(syukkin);
-				TAIKIN.add(taikin);
-				BREAKST.add(breakst);
-				BREAKEN.add(breaken);
-				OVER.add(over);
-				
-				session.setAttribute("userID", id);
-				session.setAttribute("name", name);
-				session.setAttribute("syukkin", syukkin);
-				session.setAttribute("taikin", taikin);
-				session.setAttribute("breaktime", breakst);
-				session.setAttribute("over", over);
-			}*/
+	public String syuttaikinGet(Model model) {
+		
+		List<Map<String, Object>> resultList = jdbcTemplate
+				.queryForList("SELECT * FROM 社員 INNER JOIN 出退勤 ON 社員.userID = 出退勤.userID WHERE 出退勤.day = ? GROUP BY 社員.userID;", d);
+
+		model.addAttribute("resultList", resultList);
+
 
 		return "syuttaikin";
 	}
@@ -88,12 +61,17 @@ public class SyuttaikinController {
 	/* 出勤時間登録メソッド
 	userIDと年月日を合わせて登録し出勤を一日一回までにする。*/
 	@RequestMapping(path = "/syuttaikin", params = "syukkin", method = RequestMethod.POST)
-	public String syukkin() {
+	public String syukkin(Model model) {
 
 		jdbcTemplate.update("INSERT INTO 出退勤 (userID, day, date,wortime) VALUES(?,?,?,CURTIME());", x, d, z);
 		jdbcTemplate.update("INSERT INTO 残業時間 (userID,userIDdate,date) VALUES(?,?,?);", x, z, d);
 		//jdbcTemplate.update("INSERT INTO 出勤 (userID) VALUES(?);", x);
 		jdbcTemplate.update("INSERT INTO 有給 VALUES(?,?,?,?,?,?,?);", x, 20,0,0,0,0,0);
+		
+		List<Map<String, Object>> resultList = jdbcTemplate
+				.queryForList("SELECT * FROM 社員 INNER JOIN 出退勤 ON 社員.userID = 出退勤.userID WHERE 出退勤.day = ? GROUP BY 社員.userID;", d);
+
+		model.addAttribute("resultList", resultList);
 
 		return "syuttaikin";
 
@@ -101,7 +79,7 @@ public class SyuttaikinController {
 
 	//退勤・残業時間登録メソッド
 	@RequestMapping(path = "/syuttaikin", params = "taikin", method = RequestMethod.POST)
-	public String taikin() throws ParseException {
+	public String taikin(Model model) throws ParseException {
 		
 		//定時設定
 		String teizi = "10:29:00";
@@ -195,6 +173,11 @@ public class SyuttaikinController {
 			jdbcTemplate.update("UPDATE 出退勤 SET closetime = CURTIME(), overtime = ? WHERE date = ?;", lag, z);
 			jdbcTemplate.update("UPDATE 残業時間 SET day = ?, week = ?, month = ?, year = ? WHERE userIDdate = ?;",
 					lagwhile, we, mo, ye, z);
+			
+			List<Map<String, Object>> resultList = jdbcTemplate
+					.queryForList("SELECT * FROM 社員 INNER JOIN 出退勤 ON 社員.userID = 出退勤.userID WHERE 出退勤.day = ? GROUP BY 社員.userID;", d);
+
+			model.addAttribute("resultList", resultList);
 		} else {
 			//前日取得
 			Calendar zen = Calendar.getInstance();
@@ -234,6 +217,11 @@ public class SyuttaikinController {
 			//残業してない場合はその日に0、週月年に前日の値を入れる
 			jdbcTemplate.update("UPDATE 出退勤 SET closetime = CURTIME(), overtime = 0 WHERE date = ?;", z);
 			jdbcTemplate.update("UPDATE 残業時間 SET day = 0, week = ?, month = ?, year = ? WHERE userIDdate = ?;", bwe,bmo, bye, z);
+			
+			List<Map<String, Object>> resultList = jdbcTemplate
+					.queryForList("SELECT * FROM 社員 INNER JOIN 出退勤 ON 社員.userID = 出退勤.userID WHERE 出退勤.day = ? GROUP BY 社員.userID;", d);
+
+			model.addAttribute("resultList", resultList);
 		}
 
 		return "syuttaikin";
@@ -242,23 +230,33 @@ public class SyuttaikinController {
 
 	//休憩開始時間登録メソッド
 	@RequestMapping(path = "/syuttaikin", params = "kaisi", method = RequestMethod.POST)
-	public String kaisi() {
+	public String kaisi(Model model) {
 
 		jdbcTemplate.update("UPDATE 出退勤 SET breakbegins = CURTIME() WHERE date = ?;", z);
 
+		List<Map<String, Object>> resultList = jdbcTemplate
+				.queryForList("SELECT * FROM 社員 INNER JOIN 出退勤 ON 社員.userID = 出退勤.userID WHERE 出退勤.day = ? GROUP BY 社員.userID;", d);
+
+		model.addAttribute("resultList", resultList);
+		
 		return "syuttaikin";
 
 	}
 
 	//休憩終了時間登録メソッド
 	@RequestMapping(path = "/syuttaikin", params = "syuuryou", method = RequestMethod.POST)
-	public String syuuryou() {
+	public String syuuryou(Model model) {
 
 		LocalTime nowtime = LocalTime.now();
 		if (nowtime.equals("17:00:00")) {
 
 		}
 		jdbcTemplate.update("UPDATE 出退勤 SET breakends = CURTIME() WHERE date = ?;", z);
+		
+		List<Map<String, Object>> resultList = jdbcTemplate
+				.queryForList("SELECT * FROM 社員 INNER JOIN 出退勤 ON 社員.userID = 出退勤.userID WHERE 出退勤.day = ? GROUP BY 社員.userID;", d);
+
+		model.addAttribute("resultList", resultList);
 
 		return "syuttaikin";
 

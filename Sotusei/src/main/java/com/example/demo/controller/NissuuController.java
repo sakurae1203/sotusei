@@ -63,9 +63,10 @@ public class NissuuController {
 					userID);
 		}
 		List<Map<String, Object>> resultList = jdbcTemplate
-				.queryForList("SELECT * FROM 社員 INNER JOIN 出勤  ON 社員.userID = 出勤.userID;");
+				.queryForList("SELECT * FROM 社員 INNER JOIN 出勤  ON 社員.userID = 出勤.userID INNER JOIN 有給  ON 出勤.userID = 有給.userID GROUP BY 社員.userID;");
 
 		model.addAttribute("resultList", resultList);
+		
 
 		return "nissuu";
 	}
