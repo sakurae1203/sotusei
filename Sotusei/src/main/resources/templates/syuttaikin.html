@@ -21,18 +21,18 @@
 
 			<nav class="nav">
 				<ul>
-					<li><a href="./syuttaikin.html">出勤・退勤</a></li>
-					<li><a href="./nissuu.html">出勤日数</a></li>
-					<li><a href="./zangyou.html">累計残業時間</a></li>
-					<li><a href="./sinsei1.html">有給申請</a></li>
-					<li><a href="./logout.html">ログアウト</a></li>
+					<li><a href="./syuttaikin">出勤・退勤</a></li>
+					<li><a href="./nissuu">出勤日数</a></li>
+					<li><a href="./zangyou">累計残業時間</a></li>
+					<li><a href="./sinsei1">有給申請</a></li>
+					<li><a href="./logout">ログアウト</a></li>
 				</ul>
 			</nav>
 	</header>
 	</div>
 
-			
-				<table class="table_design08">
+
+	<table class="table_design08">
 		<thead>
 			<th>氏名</th>
 			<th>出勤時間</th>
@@ -53,14 +53,14 @@
 
 
 
-			<footer>
-				<form th:action="@{/syuttaikin}" method="POST">
-					<p><input type="submit" name="syukkin" value="出勤" id="syukkin" class="button1"></p>
-					<p><input type="submit" name="taikin" value="退勤" id="taikin" class="button1"></p>
-					<p><input type="submit" name="kaisi" value="休憩開始" id="kaisi" class="button1"></p>
-					<p><input type="submit" name="syuuryou" value="休憩終了" id="syuuryou" class="button1"></p>
-				</form>
-			</footer>
-			</body>
+	<footer>
+		<form th:action="@{/syuttaikin}" method="POST">
+			<p><input type="submit" name="syukkin" value="出勤" id="syukkin" class="button1"></p>
+			<p><input type="submit" name="taikin" value="退勤" id="taikin" class="button1"></p>
+			<p><input type="submit" name="kaisi" value="休憩開始" id="kaisi" class="button1"></p>
+			<p><input type="submit" name="syuuryou" value="休憩終了" id="syuuryou" class="button1"></p>
+		</form>
+	</footer>
+	</body>
 
 </html>

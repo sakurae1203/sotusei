@@ -66,7 +66,7 @@ public class SyuttaikinController {
 		jdbcTemplate.update("INSERT INTO 出退勤 (userID, day, date,wortime) VALUES(?,?,?,CURTIME());", x, d, z);
 		jdbcTemplate.update("INSERT INTO 残業時間 (userID,userIDdate,date) VALUES(?,?,?);", x, z, d);
 		//jdbcTemplate.update("INSERT INTO 出勤 (userID) VALUES(?);", x);
-		jdbcTemplate.update("INSERT INTO 有給 VALUES(?,?,?,?,?,?,?);", x, 20,0,0,0,0,0);
+		
 		
 		List<Map<String, Object>> resultList = jdbcTemplate
 				.queryForList("SELECT * FROM 社員 INNER JOIN 出退勤 ON 社員.userID = 出退勤.userID WHERE 出退勤.day = ? GROUP BY 社員.userID;", d);

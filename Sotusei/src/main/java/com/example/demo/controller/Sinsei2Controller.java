@@ -26,7 +26,7 @@ public class Sinsei2Controller {
 
 	// 申請日登録メソッド
 	@RequestMapping(path = "/sinsei2", method = RequestMethod.POST)
-	public String syukkin(String kaisi, String syuuryou, String ziyuu, Model model, HttpSession session) {
+	public String sinsei2(String kaisi, String syuuryou, String ziyuu, Model model, HttpSession session) {
 
 		//String x = (String) session.getAttribute("userID");
 		String x = "12345";
@@ -37,9 +37,11 @@ public class Sinsei2Controller {
 		
 		jdbcTemplate.update("INSERT INTO 有給 (userID,stpaid,enpaid,detail,yearpaid,totalpaid,con) VALUES(?,?,?,?,?,?,?);", x, kaisi, syuuryou, ziyuu,0,0,0);
 
+		//有給取得数カウント
 		List<Map<String, Object>> result = jdbcTemplate.queryForList("SELECT COUNT(*) FROM 有給 WHERE userID = ?;",x);
 		
 		String npl = String.valueOf(result.get(0).get("COUNT(*)"));
+		
 		
 		List<Map<String, Object>> resultList = jdbcTemplate.queryForList("SELECT * FROM 有給 WHERE userID = ?;",x);
 		

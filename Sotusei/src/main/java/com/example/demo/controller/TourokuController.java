@@ -51,6 +51,7 @@ public class TourokuController {
 			jdbcTemplate.update("INSERT INTO 残業時間 (useID, userIDdate, day, week, month, year) VALUES (?,?,?,?,?,?);", useID,useID+bday,0,0,0,0);
 			jdbcTemplate.update("INSERT INTO 出勤 VALUES (?,?,?,?);", useID,0,0,0);
 			jdbcTemplate.update("INSERT INTO 出退勤 VALUES (?,?,?,?,?,?,?);", useID,0,0,0,0,0,0);
+			jdbcTemplate.update("INSERT INTO 有給 VALUES(?,?,?,?,?,?,?);", useID, 10,0,0,0,0,0);
 			return "redirect:/login1";
 		} else {
 			return "touroku";
