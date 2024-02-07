@@ -48,12 +48,16 @@ h1 {
     margin-bottom: 40px;
 }
 
-.a {
+a {
+	display: block;
     margin-bottom: 40px;
 }
 
-#button {
+button {
     width: 100px;
     height: 50px;
     border-radius: 10px;
+    display: block;
+    margin: 0 auto;
+    
 }

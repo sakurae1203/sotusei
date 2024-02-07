@@ -42,8 +42,7 @@ public class Login1Controller {
 			System.out.println("成功");
 			return "redirect:/syuttaikin";
 		} else {
-
-
+	        
 			System.out.println("失敗");
 
 			return "login2";

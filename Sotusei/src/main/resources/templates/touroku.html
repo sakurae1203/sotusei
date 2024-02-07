@@ -5,30 +5,30 @@
 <meta charset="UTF-8">
 <title>ユーザー登録</title>
 <link rel="stylesheet" type="text/css" href="/css/touroku.css" >
-<script src="/js/touroku.js"></script>
 </head>
 
 <body>
 	<h1>ユーザー登録</h1>
 	<form th:action="@{/touroku}" method="POST">
+		
 		<div>
 			<table>
 
 				<tr>
 					<th>ユーザーID</th>
-					<td><input type="text" name="useID" class="textbox"></td>
+					<td><input type="text" name="useID" class="textbox">(16)</td>
 				</tr>
 				<tr>
 					<th>パスワード</th>
-					<td><input type="text" name="pass" class="textbox"></td>
+					<td><input type="text" name="pass" class="textbox">(16)</td>
 				</tr>
 				<tr>
 					<th>氏名</th>
-					<td><input type="text" name="name" class="textbox"></td>
+					<td><input type="text" name="name" class="textbox">(30)</td>
 				</tr>
 				<tr>
 					<th>メールアドレス</th>
-					<td><input type="text" name="mail" class="textbox"></td>
+					<td><input type="text" name="mail" class="textbox">(40)</td>
 				</tr>
 
 			</table>

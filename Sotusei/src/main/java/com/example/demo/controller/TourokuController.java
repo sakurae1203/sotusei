@@ -30,32 +30,50 @@ public class TourokuController {
 	public String touroku(String useID, String pass, String name, String mail, Model model) {
 
 		List<Map<String, Object>> resultList = jdbcTemplate.queryForList("SELECT * FROM 社員 WHERE userID = ?", useID);
-		
-		if (resultList.size()<1) {
-			
-			Date nD = new Date();
-		    SimpleDateFormat sdf1
-		    = new SimpleDateFormat("yyyy/MM/dd");
-		    String d = sdf1.format(nD);
-			Calendar zen = Calendar.getInstance();
 
-			Date now = zen.getTime();
+		int ucount = countCharacters(useID);
+		int pcount = countCharacters(pass);
+		int ncount = countCharacters(name);
+		int mcount = countCharacters(mail);
 
-			zen.add(Calendar.DAY_OF_MONTH, -1);
-			now = zen.getTime();
-			String bday = sdf1.format(now);
+		System.out.println(ucount + "," + pcount + "," + ncount + "," + mcount);
+
+		if(useID == null && pass != null && name != null && mail != null) {
 			
-			//DBに繋ぐならこんな感じ(JdbcTemplate)
-			jdbcTemplate.update("INSERT INTO 社員 VALUES (?,?,?,?);", useID, pass, name, mail);
-			jdbcTemplate.update("INSERT INTO ワンタイム VALUES (?,?);", mail,0);
-			jdbcTemplate.update("INSERT INTO 残業時間 (useID, userIDdate, day, week, month, year) VALUES (?,?,?,?,?,?);", useID,useID+bday,0,0,0,0);
-			jdbcTemplate.update("INSERT INTO 出勤 VALUES (?,?,?,?);", useID,0,0,0);
-			jdbcTemplate.update("INSERT INTO 出退勤 VALUES (?,?,?,?,?,?,?);", useID,0,0,0,0,0,0);
-			jdbcTemplate.update("INSERT INTO 有給 VALUES(?,?,?,?,?,?,?);", useID, 10,0,0,0,0,0);
-			return "redirect:/login1";
+		if (ucount <= 16 && pcount <= 16 && ncount <= 30 && mcount <= 40) {
+
+			if (resultList.size() < 1) {
+
+				SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy/MM/dd");
+				Calendar zen = Calendar.getInstance();
+
+				Date now = zen.getTime();
+
+				zen.add(Calendar.DAY_OF_MONTH, -1);
+				now = zen.getTime();
+				String bday = sdf1.format(now);
+
+				//DBに繋ぐならこんな感じ(JdbcTemplate)
+				jdbcTemplate.update("INSERT INTO 社員 VALUES (?,?,?,?);", useID, pass, name, mail);
+				jdbcTemplate.update("INSERT INTO ワンタイム VALUES (?,?);", mail, 0);
+				jdbcTemplate.update("INSERT INTO 残業時間 VALUES (?,?,?,?,?,?);", useID,useID + bday, bday, 0, 0, 0, 0);
+				jdbcTemplate.update("INSERT INTO 出勤 VALUES (?,?,?,?);", useID, 0, 0, 0);
+				jdbcTemplate.update("INSERT INTO 出退勤 VALUES (?,?,?,?,?,?,?);", useID, 0, 0, 0, 0, 0, 0);
+				jdbcTemplate.update("INSERT INTO 有給 VALUES(?,?,?,?,?,?,?);", useID, 10, 0, 0, 0, 0, 0);
+				return "redirect:/login1";
+			} else {
+				return "tourokudualert";
+			}
 		} else {
-			return "touroku";
+			return "tourokuoralert";
 		}
+	}else {
+		return "tourokunullalert";
+	}
+	}
+
+	public static int countCharacters(String text) {
+		return text.length();
 	}
 
 }
