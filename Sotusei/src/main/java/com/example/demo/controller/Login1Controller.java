@@ -19,10 +19,12 @@ public class Login1Controller {
 
 	@Autowired
 	JdbcTemplate jdbcTemplate;
+	public Object session;
 
 	//(ページ表示用メソッド)
 	@RequestMapping(path = "/login1", method = RequestMethod.GET)
-	public String useridGet() {
+	public String useridGet(HttpSession session) {
+		
 		return "login1";
 	}
 
@@ -36,8 +38,8 @@ public class Login1Controller {
 		if (resultList.size() > 0 && resultList.get(0).get("password").equals(pass)) {
 
 			session.setAttribute("resultList", resultList);
-
-			//return "redirect:/login2";
+			
+			session.setAttribute("useID", useID);
 
 			System.out.println("成功");
 			return "redirect:/syuttaikin";

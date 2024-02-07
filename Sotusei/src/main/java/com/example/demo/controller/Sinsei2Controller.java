@@ -17,10 +17,13 @@ public class Sinsei2Controller {
 
 	@Autowired
 	JdbcTemplate jdbcTemplate;
+	
+	@Autowired
+	HttpSession session;
 
 	//(ページ表示用メソッド)
 	@RequestMapping(path = "/sinsei2", method = RequestMethod.GET)
-	public String syuttaikinGet(HttpSession session) {
+	public String syuttaikinGet() {
 		return "sinsei2";
 	}
 
@@ -28,8 +31,7 @@ public class Sinsei2Controller {
 	@RequestMapping(path = "/sinsei2", method = RequestMethod.POST)
 	public String sinsei2(String kaisi, String syuuryou, String ziyuu, Model model, HttpSession session) {
 
-		//String x = (String) session.getAttribute("userID");
-		String x = "12345";
+		String x = (String) session.getAttribute("useID");
 		
 		//出勤日数カウント
 		List<Map<String, Object>> resultnissuu = jdbcTemplate.queryForList("SELECT COUNT(*) FROM 出退勤 GROUP BY userID;");

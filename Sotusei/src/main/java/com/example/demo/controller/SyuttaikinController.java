@@ -19,41 +19,37 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import jakarta.servlet.http.HttpSession;
+
 @Controller
 public class SyuttaikinController {
 
 	@Autowired
 	JdbcTemplate jdbcTemplate;
 
-	//LocalDate day = LocalDate.now();
-
-	//List<String> ID, NAME, SYUKKIN, TAIKIN, BREAKST, BREAKEN, OVER = new ArrayList<String>();
-
-	Date nD = new Date();
-	SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy/MM/dd");
-	String d = sdf1.format(nD);
-	//userIDの引継ぎ方がわかり次第修正
-	//String x = (String) session.getAttribute("userID");
-	String x = "12345";
-	String z = x + d;
+	@Autowired
+	HttpSession session;
 
 	SimpleDateFormat ymd = new SimpleDateFormat("yyyy:MM:dd");
 
 	int oversum = 0;
-	// 終了する時刻を指定
-	/*String targetTimeStr = "23:58";
-	DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
-	LocalTime targetTime = LocalTime.parse(targetTimeStr, formatter);*/
 
 	//(ページ表示用メソッド)
 	@RequestMapping(path = "/syuttaikin", method = RequestMethod.GET)
 	public String syuttaikinGet(Model model) {
 		
+		Date nD = new Date();
+		SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy/MM/dd");
+		String d = sdf1.format(nD);
+		String x = (String) session.getAttribute("useID");
+		String z = x + d;
+
 		List<Map<String, Object>> resultList = jdbcTemplate
-				.queryForList("SELECT * FROM 社員 INNER JOIN 出退勤 ON 社員.userID = 出退勤.userID WHERE 出退勤.day = ? GROUP BY 社員.userID;", d);
+				.queryForList(
+						"SELECT * FROM 社員 INNER JOIN 出退勤 ON 社員.userID = 出退勤.userID WHERE 出退勤.day = ? GROUP BY 社員.userID;",
+						d);
 
 		model.addAttribute("resultList", resultList);
-
 
 		return "syuttaikin";
 	}
@@ -62,14 +58,21 @@ public class SyuttaikinController {
 	userIDと年月日を合わせて登録し出勤を一日一回までにする。*/
 	@RequestMapping(path = "/syuttaikin", params = "syukkin", method = RequestMethod.POST)
 	public String syukkin(Model model) {
+		
+		Date nD = new Date();
+		SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy/MM/dd");
+		String d = sdf1.format(nD);
+		String x = (String) session.getAttribute("useID");
+		String z = x + d;
 
 		jdbcTemplate.update("INSERT INTO 出退勤 (userID, day, date,wortime) VALUES(?,?,?,CURTIME());", x, d, z);
 		jdbcTemplate.update("INSERT INTO 残業時間 (userID,userIDdate,date) VALUES(?,?,?);", x, z, d);
 		//jdbcTemplate.update("INSERT INTO 出勤 (userID) VALUES(?);", x);
-		
-		
+
 		List<Map<String, Object>> resultList = jdbcTemplate
-				.queryForList("SELECT * FROM 社員 INNER JOIN 出退勤 ON 社員.userID = 出退勤.userID WHERE 出退勤.day = ? GROUP BY 社員.userID;", d);
+				.queryForList(
+						"SELECT * FROM 社員 INNER JOIN 出退勤 ON 社員.userID = 出退勤.userID WHERE 出退勤.day = ? GROUP BY 社員.userID;",
+						d);
 
 		model.addAttribute("resultList", resultList);
 
@@ -81,6 +84,12 @@ public class SyuttaikinController {
 	@RequestMapping(path = "/syuttaikin", params = "taikin", method = RequestMethod.POST)
 	public String taikin(Model model) throws ParseException {
 		
+		Date nD = new Date();
+		SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy/MM/dd");
+		String d = sdf1.format(nD);
+		String x = (String) session.getAttribute("useID");
+		String z = x + d;
+
 		//定時設定
 		String teizi = "10:29:00";
 
@@ -173,9 +182,11 @@ public class SyuttaikinController {
 			jdbcTemplate.update("UPDATE 出退勤 SET closetime = CURTIME(), overtime = ? WHERE date = ?;", lag, z);
 			jdbcTemplate.update("UPDATE 残業時間 SET day = ?, week = ?, month = ?, year = ? WHERE userIDdate = ?;",
 					lagwhile, we, mo, ye, z);
-			
+
 			List<Map<String, Object>> resultList = jdbcTemplate
-					.queryForList("SELECT * FROM 社員 INNER JOIN 出退勤 ON 社員.userID = 出退勤.userID WHERE 出退勤.day = ? GROUP BY 社員.userID;", d);
+					.queryForList(
+							"SELECT * FROM 社員 INNER JOIN 出退勤 ON 社員.userID = 出退勤.userID WHERE 出退勤.day = ? GROUP BY 社員.userID;",
+							d);
 
 			model.addAttribute("resultList", resultList);
 		} else {
@@ -216,10 +227,13 @@ public class SyuttaikinController {
 					localTime.getSecond());
 			//残業してない場合はその日に0、週月年に前日の値を入れる
 			jdbcTemplate.update("UPDATE 出退勤 SET closetime = CURTIME(), overtime = 0 WHERE date = ?;", z);
-			jdbcTemplate.update("UPDATE 残業時間 SET day = 0, week = ?, month = ?, year = ? WHERE userIDdate = ?;", bwe,bmo, bye, z);
-			
+			jdbcTemplate.update("UPDATE 残業時間 SET day = 0, week = ?, month = ?, year = ? WHERE userIDdate = ?;", bwe,
+					bmo, bye, z);
+
 			List<Map<String, Object>> resultList = jdbcTemplate
-					.queryForList("SELECT * FROM 社員 INNER JOIN 出退勤 ON 社員.userID = 出退勤.userID WHERE 出退勤.day = ? GROUP BY 社員.userID;", d);
+					.queryForList(
+							"SELECT * FROM 社員 INNER JOIN 出退勤 ON 社員.userID = 出退勤.userID WHERE 出退勤.day = ? GROUP BY 社員.userID;",
+							d);
 
 			model.addAttribute("resultList", resultList);
 		}
@@ -231,14 +245,22 @@ public class SyuttaikinController {
 	//休憩開始時間登録メソッド
 	@RequestMapping(path = "/syuttaikin", params = "kaisi", method = RequestMethod.POST)
 	public String kaisi(Model model) {
+		
+		Date nD = new Date();
+		SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy/MM/dd");
+		String d = sdf1.format(nD);
+		String x = (String) session.getAttribute("useID");
+		String z = x + d;
 
 		jdbcTemplate.update("UPDATE 出退勤 SET breakbegins = CURTIME() WHERE date = ?;", z);
 
 		List<Map<String, Object>> resultList = jdbcTemplate
-				.queryForList("SELECT * FROM 社員 INNER JOIN 出退勤 ON 社員.userID = 出退勤.userID WHERE 出退勤.day = ? GROUP BY 社員.userID;", d);
+				.queryForList(
+						"SELECT * FROM 社員 INNER JOIN 出退勤 ON 社員.userID = 出退勤.userID WHERE 出退勤.day = ? GROUP BY 社員.userID;",
+						d);
 
 		model.addAttribute("resultList", resultList);
-		
+
 		return "syuttaikin";
 
 	}
@@ -246,15 +268,23 @@ public class SyuttaikinController {
 	//休憩終了時間登録メソッド
 	@RequestMapping(path = "/syuttaikin", params = "syuuryou", method = RequestMethod.POST)
 	public String syuuryou(Model model) {
+		
+		Date nD = new Date();
+		SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy/MM/dd");
+		String d = sdf1.format(nD);
+		String x = (String) session.getAttribute("useID");
+		String z = x + d;
 
 		LocalTime nowtime = LocalTime.now();
 		if (nowtime.equals("17:00:00")) {
 
 		}
 		jdbcTemplate.update("UPDATE 出退勤 SET breakends = CURTIME() WHERE date = ?;", z);
-		
+
 		List<Map<String, Object>> resultList = jdbcTemplate
-				.queryForList("SELECT * FROM 社員 INNER JOIN 出退勤 ON 社員.userID = 出退勤.userID WHERE 出退勤.day = ? GROUP BY 社員.userID;", d);
+				.queryForList(
+						"SELECT * FROM 社員 INNER JOIN 出退勤 ON 社員.userID = 出退勤.userID WHERE 出退勤.day = ? GROUP BY 社員.userID;",
+						d);
 
 		model.addAttribute("resultList", resultList);
 
@@ -297,4 +327,5 @@ public class SyuttaikinController {
 		// 時刻形式に変換して文字列として返す
 		return String.format("%02d%02d%02d", hou, min, sec);
 	}
+
 }

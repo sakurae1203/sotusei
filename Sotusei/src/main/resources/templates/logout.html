@@ -2,19 +2,19 @@
 <html lang="ja">
 
 <head>
-    <meta harset="UTF-8">
-    <title>logout</title>
-   <!-- <link rel="stylesheet" type="text/css" href="../static/css/logout.css">-->
+	<meta harset="UTF-8">
+	<title>logout</title>
+	<link rel="stylesheet" type="text/css" href="../css/logout.css">
 
 </head>
 
 <body>
- <!--   <div class="all">
-        <h1>ログアウトしますか?</h1>
-        <form action="./login1.html">
-            <p><input id="logout" type="submit" value="ログアウト"></p>
-        </form>
-        <button id="cancel" type="button" onclick="history.back()">キャンセル</button>-->
+	<div class="all">
+		<h1>ログアウトしますか?</h1>
+		<form th:action="@{/logout}" method="POST">
+			<p><input id="logout" type="submit" value="ログアウト"></p>
+		</form>
+		<button id="cancel" type="button" onclick="history.back()">キャンセル</button>
 </body>
 
 </html>
