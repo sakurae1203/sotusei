@@ -23,6 +23,10 @@ figure {
 }
 
 body {
+  overflow-x: hidden;
+}
+
+body {
     text-align: center;
 }
 

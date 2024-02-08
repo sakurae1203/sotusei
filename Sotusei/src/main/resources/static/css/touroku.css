@@ -22,7 +22,9 @@ figure {
     padding: 0;
 }
 
-
+body {
+  overflow-x: hidden;
+}
 
 body {
     text-align: center;

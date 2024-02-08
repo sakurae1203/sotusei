@@ -29,9 +29,11 @@ public class Sinsei1Controller {
     public String sinsei1Get(Model model) {
     	
     	String x = (String) session.getAttribute("useID");
-        
+        try {
         List<Map<String, Object>> resultList = jdbcTemplate
                 .queryForList("SELECT * FROM 有給 WHERE userID = ?;", x);
+        
+        paid.clear();
         
         for(int i = 1; i<resultList.size();i++) {
         String st = (String) resultList.get(i).get("stpaid");
@@ -45,6 +47,11 @@ public class Sinsei1Controller {
         
         
         return "sinsei1";
+    } catch (Exception e) {
+        System.out.println("DB接続失敗");
+        e.printStackTrace();
+        return "dberror";
+    }
     }
     
 }

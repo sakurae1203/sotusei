@@ -26,14 +26,21 @@ public class ZangyouController {
 	@RequestMapping(path = "/zangyou", method = RequestMethod.GET)
 	public String zangyouGet(Model model) {
 
-		List<Map<String, Object>> resultList = jdbcTemplate
-				.queryForList(
-						"SELECT * FROM 社員 INNER JOIN 残業時間 ON 社員.userID = 残業時間.userID WHERE date = ? GROUP BY 社員.userID;",
-						d);
+		try {
+			List<Map<String, Object>> resultList = jdbcTemplate
+					.queryForList(
+							"SELECT * FROM 社員 INNER JOIN 残業時間 ON 社員.userID = 残業時間.userID WHERE date = ? GROUP BY 社員.userID;",
+							d);
 
-		model.addAttribute("resultList", resultList);
+			model.addAttribute("resultList", resultList);
 
-		return "zangyou";
+			return "zangyou";
+
+		} catch (Exception e) {
+			System.out.println("データベースへのアクセスに失敗しました。");
+			e.printStackTrace();
+			return "dberror";
+		}
 	}
 
 }

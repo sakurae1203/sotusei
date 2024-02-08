@@ -28,48 +28,56 @@ public class TourokuController {
 	// 新規登録メソッド
 	@RequestMapping(path = "/touroku", method = RequestMethod.POST)
 	public String touroku(String useID, String pass, String name, String mail, Model model) {
+		try {
+			List<Map<String, Object>> resultList = jdbcTemplate.queryForList("SELECT * FROM 社員 WHERE userID = ?",
+					useID);
 
-		List<Map<String, Object>> resultList = jdbcTemplate.queryForList("SELECT * FROM 社員 WHERE userID = ?", useID);
+			int ucount = countCharacters(useID);
+			int pcount = countCharacters(pass);
+			int ncount = countCharacters(name);
+			int mcount = countCharacters(mail);
 
-		int ucount = countCharacters(useID);
-		int pcount = countCharacters(pass);
-		int ncount = countCharacters(name);
-		int mcount = countCharacters(mail);
+			System.out.println(ucount + "," + pcount + "," + ncount + "," + mcount);
 
-		System.out.println(ucount + "," + pcount + "," + ncount + "," + mcount);
+			if (useID == null && pass != null && name != null && mail != null) {
 
-		if(useID == null && pass != null && name != null && mail != null) {
-			
-		if (ucount <= 16 && pcount <= 16 && ncount <= 30 && mcount <= 40) {
+				if (ucount <= 16 && pcount <= 16 && ncount <= 30 && mcount <= 40) {
 
-			if (resultList.size() < 1) {
+					if (resultList.size() < 1) {
 
-				SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy/MM/dd");
-				Calendar zen = Calendar.getInstance();
+						SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy/MM/dd");
+						Calendar zen = Calendar.getInstance();
 
-				Date now = zen.getTime();
+						Date now = zen.getTime();
 
-				zen.add(Calendar.DAY_OF_MONTH, -1);
-				now = zen.getTime();
-				String bday = sdf1.format(now);
+						zen.add(Calendar.DAY_OF_MONTH, -1);
+						now = zen.getTime();
+						String bday = sdf1.format(now);
 
-				//DBに繋ぐならこんな感じ(JdbcTemplate)
-				jdbcTemplate.update("INSERT INTO 社員 VALUES (?,?,?,?);", useID, pass, name, mail);
-				jdbcTemplate.update("INSERT INTO ワンタイム VALUES (?,?);", mail, 0);
-				jdbcTemplate.update("INSERT INTO 残業時間 VALUES (?,?,?,?,?,?);", useID,useID + bday, bday, 0, 0, 0, 0);
-				jdbcTemplate.update("INSERT INTO 出勤 VALUES (?,?,?,?);", useID, 0, 0, 0);
-				jdbcTemplate.update("INSERT INTO 出退勤 VALUES (?,?,?,?,?,?,?);", useID, 0, 0, 0, 0, 0, 0);
-				jdbcTemplate.update("INSERT INTO 有給 VALUES(?,?,?,?,?,?,?);", useID, 10, 0, 0, 0, 0, 0);
-				return "redirect:/login1";
+						//DBに繋ぐならこんな感じ(JdbcTemplate)
+						jdbcTemplate.update("INSERT INTO 社員 VALUES (?,?,?,?);", useID, pass, name, mail);
+						jdbcTemplate.update("INSERT INTO ワンタイム VALUES (?,?);", mail, 0);
+						jdbcTemplate.update("INSERT INTO 残業時間 VALUES (?,?,?,?,?,?);", useID, useID + bday, bday, 0, 0,
+								0, 0);
+						jdbcTemplate.update("INSERT INTO 出勤 VALUES (?,?,?,?);", useID, 0, 0, 0);
+						jdbcTemplate.update("INSERT INTO 出退勤 VALUES (?,?,?,?,?,?,?);", useID, 0, 0, 0, 0, 0, 0);
+						jdbcTemplate.update("INSERT INTO 有給 VALUES(?,?,?,?,?,?,?);", useID, 10, 0, 0, 0, 0, 0);
+						return "redirect:/login1";
+					} else {
+						return "tourokudualert";
+					}
+				} else {
+					return "tourokuoralert";
+				}
 			} else {
-				return "tourokudualert";
+				return "tourokunullalert";
 			}
-		} else {
-			return "tourokuoralert";
+
+		} catch (Exception e) {
+			System.out.println("データベースへのアクセスに失敗しました。");
+			e.printStackTrace();
+			return "dberror";
 		}
-	}else {
-		return "tourokunullalert";
-	}
 	}
 
 	public static int countCharacters(String text) {

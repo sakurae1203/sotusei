@@ -17,7 +17,7 @@ public class Sinsei2Controller {
 
 	@Autowired
 	JdbcTemplate jdbcTemplate;
-	
+
 	@Autowired
 	HttpSession session;
 
@@ -30,32 +30,43 @@ public class Sinsei2Controller {
 	// 申請日登録メソッド
 	@RequestMapping(path = "/sinsei2", method = RequestMethod.POST)
 	public String sinsei2(String kaisi, String syuuryou, String ziyuu, Model model, HttpSession session) {
+	    try {
+	        if (kaisi.equals("") || syuuryou.equals("") || ziyuu.equals("")) {
+	            return "sinseinull";
+	        } else {
+	            String x = (String) session.getAttribute("useID");
 
-		String x = (String) session.getAttribute("useID");
-		
-		//出勤日数カウント
-		List<Map<String, Object>> resultnissuu = jdbcTemplate.queryForList("SELECT COUNT(*) FROM 出退勤 GROUP BY userID;");
-			String nwd = String.valueOf(resultnissuu.get(0).get("COUNT(*)"));
-		
-		jdbcTemplate.update("INSERT INTO 有給 (userID,stpaid,enpaid,detail,yearpaid,totalpaid,con) VALUES(?,?,?,?,?,?,?);", x, kaisi, syuuryou, ziyuu,0,0,0);
+	            // 出勤日数カウント
+	            List<Map<String, Object>> resultnissuu = jdbcTemplate
+	                    .queryForList("SELECT COUNT(*) FROM 出退勤 GROUP BY userID;");
+	            String nwd = String.valueOf(resultnissuu.get(0).get("COUNT(*)"));
 
-		//有給取得数カウント
-		List<Map<String, Object>> result = jdbcTemplate.queryForList("SELECT COUNT(*) FROM 有給 WHERE userID = ?;",x);
-		
-		String npl = String.valueOf(result.get(0).get("COUNT(*)"));
-		
-		
-		List<Map<String, Object>> resultList = jdbcTemplate.queryForList("SELECT * FROM 有給 WHERE userID = ?;",x);
-		
-		int year = Integer.parseInt((String) resultList.get(0).get("yearpaid"));
-		year = year - Integer.parseInt(npl) + Integer.parseInt(nwd);
-		System.out.println(year);
-		
-		jdbcTemplate.update("UPDATE 有給 SET yearpaid = ?, totalpaid = ? WHERE userID = ?;", year, npl, x);
-		
-		jdbcTemplate.update("UPDATE 出勤 SET paid = ? WHERE userID = ?;", npl, x);
-		
-		//return "redirect:/sinsei1";
-		return "sinsei2";
+	            jdbcTemplate.update(
+	                    "INSERT INTO 有給 (userID,stpaid,enpaid,detail,yearpaid,totalpaid,con) VALUES(?,?,?,?,?,?,?);", x,
+	                    kaisi, syuuryou, ziyuu, 0, 0, 0);
+
+	            // 有給取得数カウント
+	            List<Map<String, Object>> result = jdbcTemplate.queryForList("SELECT COUNT(*) FROM 有給 WHERE userID = ?;",
+	                    x);
+
+	            String npl = String.valueOf(result.get(0).get("COUNT(*)"));
+
+	            List<Map<String, Object>> resultList = jdbcTemplate.queryForList("SELECT * FROM 有給 WHERE userID = ?;", x);
+
+	            int year = Integer.parseInt((String) resultList.get(0).get("yearpaid"));
+	            year = year - Integer.parseInt(npl) + Integer.parseInt(nwd);
+
+	            jdbcTemplate.update("UPDATE 有給 SET yearpaid = ?, totalpaid = ? WHERE userID = ?;", year, npl, x);
+
+	            jdbcTemplate.update("UPDATE 出勤 SET paid = ? WHERE userID = ?;", npl, x);
+
+	            return "sinsei2";
+	        }
+	    } catch (Exception e) {
+	        System.out.println("データベースへのアクセスに失敗しました。");
+	        e.printStackTrace();
+	        return "dberror";
+	    }
 	}
+
 }

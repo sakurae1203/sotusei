@@ -40,7 +40,7 @@ public class NissuuController {
 		if(MM < 4) {
 			yyyy--;
 		}
-		
+		try {
 		//出勤日数カウント
 		List<Map<String, Object>> result = jdbcTemplate.queryForList("SELECT COUNT(*) FROM 出退勤 GROUP BY userID;");
 		for (int i = 0; i < result.size(); i++) {
@@ -69,6 +69,11 @@ public class NissuuController {
 		
 
 		return "nissuu";
+    } catch (Exception e) {
+        System.out.println("DB接続失敗");
+        e.printStackTrace();
+        return "dberror";
+    }
 	}
 
 	public static long daysUntilTodayInFiscalYear(int fiscalYear) {
