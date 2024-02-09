@@ -1,22 +1,16 @@
-<<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ja">
-
 <head>
-	<meta harset="UTF-8">
-
-	<title>出勤エラー</title>
-
+    <meta charset="UTF-8">
+    <title>接続エラー</title>
 </head>
-
 <body>
-
-	    <script>
-
-            alert("接続に失敗しました。")
-            // 遷移先のURLを指定してリダイレクト
-             window.location.href = "history.back()";
+    <script>
+        // アラートボックスを表示
+        alert("接続に失敗しました。");
+        
+        // アラートのOKボタンが押された後に前の画面に戻る
+        window.location.href = document.referrer;
     </script>
-    
 </body>
-
 </html>

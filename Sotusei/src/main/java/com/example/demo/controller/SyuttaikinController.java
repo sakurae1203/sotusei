@@ -49,6 +49,8 @@ public class SyuttaikinController {
 					.queryForList(
 							"SELECT * FROM 社員 LEFT JOIN 出退勤 ON 社員.userID = 出退勤.userID LEFT JOIN 残業時間 ON 社員.userID = 残業時間.userID WHERE 出退勤.date = ? GROUP BY 社員.userID;",
 							d);
+			
+			System.out.println(resultList.get(0).get("day"));
 
 			model.addAttribute("resultList", resultList);
 
