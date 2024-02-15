@@ -54,13 +54,13 @@ public class Sinsei2Controller {
 	            List<Map<String, Object>> resultList = jdbcTemplate.queryForList("SELECT * FROM 有給 WHERE userID = ?;", x);
 
 	            int year = Integer.parseInt((String) resultList.get(0).get("yearpaid"));
-	            year = year - Integer.parseInt(npl) + Integer.parseInt(nwd);
+	            year = year - Integer.parseInt(npl) +1;
 
 	            jdbcTemplate.update("UPDATE 有給 SET yearpaid = ?, totalpaid = ? WHERE userID = ?;", year, npl, x);
 
 	            jdbcTemplate.update("UPDATE 出勤 SET paid = ? WHERE userID = ?;", npl, x);
 
-	            return "sinsei2";
+	            return "redirect:/sinsei1";
 	        }
 	    } catch (Exception e) {
 	        System.out.println("データベースへのアクセスに失敗しました。");

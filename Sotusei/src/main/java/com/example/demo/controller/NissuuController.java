@@ -47,20 +47,13 @@ public class NissuuController {
 			nwd.add(String.valueOf(result.get(i).get("COUNT(*)")));
 		}
 
-		//出勤日数、欠勤日数登録(別のクラスに移したほうがよさそう)
+		//出勤日数登録(別のクラスに移したほうがよさそう)
 		List<Map<String, Object>> resultID = jdbcTemplate
 				.queryForList("SELECT * FROM 出勤;");
 		for (int i = 0; i < resultID.size(); i++) {
 			userID = (String) resultID.get(i).get("userID");
-			List<Map<String, Object>> resultpaid = jdbcTemplate
-					.queryForList("SELECT COUNT(*) FROM 有給 WHERE userID = ?;", userID);
-			String npl = String.valueOf(resultpaid.get(0).get("COUNT(*)"));
-
-			int year = yyyy;
-			long days = daysUntilTodayInFiscalYear(year);
-			int daysAbsent = (int) (days - (Integer.parseInt(nwd.get(i)) + Integer.parseInt(npl)));
-			jdbcTemplate.update("UPDATE 出勤 SET workday = ?, adsent = ? WHERE userID = ?;", nwd.get(i), daysAbsent,
-					userID);
+			
+			jdbcTemplate.update("UPDATE 出勤 SET workday = ? WHERE userID = ?;", nwd.get(i), userID);
 		}
 		List<Map<String, Object>> resultList = jdbcTemplate
 				.queryForList("SELECT * FROM 社員 INNER JOIN 出勤  ON 社員.userID = 出勤.userID INNER JOIN 有給  ON 出勤.userID = 有給.userID GROUP BY 社員.userID;");

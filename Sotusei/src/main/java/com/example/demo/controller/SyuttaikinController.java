@@ -4,6 +4,7 @@ import java.sql.Time;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -14,6 +15,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,36 +32,30 @@ public class SyuttaikinController {
 	@Autowired
 	HttpSession session;
 
+	/*@Autowired
+	private ApplicationContext context;*/
+
 	SimpleDateFormat ymd = new SimpleDateFormat("yyyy:MM:dd");
 
+	private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+	private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+
 	int oversum = 0;
+
+	int a = 0;
+
+	//始業時間
+	String sigyou = "09:00:00";
+
+	//定時設定
+	String teizi = "14:54:00";
 
 	//(ページ表示用メソッド)
 	@RequestMapping(path = "/syuttaikin", method = RequestMethod.GET)
 	public String syuttaikinGet(Model model) {
 
-		Date nD = new Date();
-		SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy/MM/dd");
-		String d = sdf1.format(nD);
-		String x = (String) session.getAttribute("useID");
-		String z = x + d;
+		return "syuttaikin";
 
-		try {
-			List<Map<String, Object>> resultList = jdbcTemplate
-					.queryForList(
-							"SELECT * FROM 社員 LEFT JOIN 出退勤 ON 社員.userID = 出退勤.userID LEFT JOIN 残業時間 ON 社員.userID = 残業時間.userID WHERE 出退勤.date = ? GROUP BY 社員.userID;",
-							d);
-			
-			System.out.println(resultList.get(0).get("day"));
-
-			model.addAttribute("resultList", resultList);
-
-			return "syuttaikin";
-		} catch (Exception e) {
-			System.out.println("データベースへのアクセスに失敗しました。");
-			e.printStackTrace();
-			return "dberror";
-		}
 	}
 
 	/* 出勤時間登録メソッド
@@ -85,6 +81,8 @@ public class SyuttaikinController {
 						.queryForList(
 								"SELECT * FROM 社員 LEFT JOIN 出退勤 ON 社員.userID = 出退勤.userID LEFT JOIN 残業時間 ON 社員.userID = 残業時間.userID WHERE 出退勤.date = ? GROUP BY 社員.userID;",
 								d);
+
+				a = 1;
 
 				model.addAttribute("resultList", resultList);
 
@@ -120,8 +118,6 @@ public class SyuttaikinController {
 				String tai = (String) result.get(0).get("closetime");
 
 				if (tai.equals("0")) {
-					//定時設定
-					String teizi = "10:29:00";
 
 					//残業開始判定時間
 					String targetTimeStr = teizi;
@@ -290,7 +286,7 @@ public class SyuttaikinController {
 
 	//休憩開始時間登録メソッド
 	@RequestMapping(path = "/syuttaikin", params = "kaisi", method = RequestMethod.POST)
-	public String kaisi(Model model) {
+	public String kaisi(Model model, HttpSession session) {
 
 		Date nD = new Date();
 		SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy/MM/dd");
@@ -314,6 +310,9 @@ public class SyuttaikinController {
 									d);
 
 					model.addAttribute("resultList", resultList);
+
+					int a = 1;
+					session.setAttribute("a", a);
 
 					return "syuttaikin";
 				} else {
@@ -385,6 +384,25 @@ public class SyuttaikinController {
 
 	}
 
+	//欠勤時処理
+	@Async
+	public void doBackgroundTask() {
+		// 非同期でバックグラウンドで実行されるメソッド
+		while (true) {
+			try {
+				while (true) {
+
+					executeBackgroundTask();
+
+					Thread.sleep(60000); // 1分待機
+				}
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+				// スレッドが割り込まれた場合の処理
+			}
+		}
+	}
+
 	//時間超過判定メソッド
 	public static boolean isTimeAfterTarget(java.util.Date targetTime2) {
 		LocalTime currentLocalTime = LocalTime.now();
@@ -429,6 +447,63 @@ public class SyuttaikinController {
 
 		// 時刻形式に変換して文字列として返す
 		return String.format("%02d:%02d:%02d", hou, min, sec);
+	}
+
+	//欠勤判定メソッド
+	private void executeBackgroundTask() {
+		try {
+			SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+			Date teiziTime = sdf.parse(teizi);
+
+			LocalDateTime now = LocalDateTime.now();
+			String d = dateFormatter.format(now);
+			String x = (String) session.getAttribute("useID");
+			String z = x + d;
+			
+			String u;
+
+			//出勤していない社員を取得する
+			List<Map<String, Object>> resultno = jdbcTemplate.queryForList(
+					"SELECT 社員.* FROM 社員 LEFT JOIN 出退勤 ON 社員.userID = 出退勤.userID AND DATE(出退勤.date) = CURDATE() WHERE 出退勤.userID IS NULL;");
+			for(int i = 0;i < resultno.size();i++) {
+				u = (String) resultno.get(i).get("userID");
+			List<Map<String, Object>> resulty = jdbcTemplate.queryForList("SELECT * FROM 有給 WHERE userID = ?;", u);
+			LocalDate s;
+			LocalDate e;
+			LocalDate t = LocalDate.now();
+			for (int j = 1; i < resulty.size(); i++) {
+				s = (LocalDate) resulty.get(j).get("stpaid");
+				e = (LocalDate) resulty.get(j).get("enpaid");
+				boolean boo = isDateInRange(s, e, t);
+
+				if (boo) {
+
+				} else {
+					if (isTimeAfterTarget(teiziTime)) {
+						List<Map<String, Object>> result = jdbcTemplate.queryForList(
+								"SELECT * FROM 出勤 WHERE userID = ?;", u);
+						int b = (int) result.get(i).get("adsent");
+						b++;
+						System.out.println(b);
+						jdbcTemplate.update("UPDATE 出勤 SET adsent = ? WHERE userID = ?;", b, u);
+
+					}
+				}
+			}
+
+			}
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public static boolean isDateInRange(LocalDate arg1, LocalDate arg2, LocalDate dateToCheck) {
+		// 引数1と引数2の大小関係を確認し、範囲を設定する
+		LocalDate startDate = arg1.isBefore(arg2) ? arg1 : arg2;
+		LocalDate endDate = arg1.isBefore(arg2) ? arg2 : arg1;
+
+		// チェックする日付が範囲内にあるかどうかを確認する
+		return !dateToCheck.isBefore(startDate) && !dateToCheck.isAfter(endDate);
 	}
 
 }
