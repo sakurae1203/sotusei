@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -36,9 +37,9 @@ public class Sinsei1Controller {
         paid.clear();
         
         for(int i = 1; i<resultList.size();i++) {
-        String st = (String) resultList.get(i).get("stpaid");
+        Date st = (Date) resultList.get(i).get("stpaid");
         
-        String en = (String) resultList.get(i).get("enpaid");
+        Date en = (Date) resultList.get(i).get("enpaid");
         
          paid.add(st + "～" + en);
         }
