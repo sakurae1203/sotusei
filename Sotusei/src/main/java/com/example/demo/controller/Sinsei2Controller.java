@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import java.sql.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -29,7 +30,7 @@ public class Sinsei2Controller {
 
 	// 申請日登録メソッド
 	@RequestMapping(path = "/sinsei2", method = RequestMethod.POST)
-	public String sinsei2(String kaisi, String syuuryou, String ziyuu, Model model, HttpSession session) {
+	public String sinsei2(Date kaisi, Date syuuryou, String ziyuu, Model model, HttpSession session) {
 	    try {
 	        if (kaisi.equals("") || syuuryou.equals("") || ziyuu.equals("")) {
 	            return "sinseinull";
@@ -60,7 +61,7 @@ public class Sinsei2Controller {
 
 	            jdbcTemplate.update("UPDATE 出勤 SET paid = ? WHERE userID = ?;", npl, x);
 
-	            return "redirect:/sinsei1";
+	            return "sinsei1";
 	        }
 	    } catch (Exception e) {
 	        System.out.println("データベースへのアクセスに失敗しました。");
