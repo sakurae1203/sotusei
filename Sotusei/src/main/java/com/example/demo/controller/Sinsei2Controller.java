@@ -32,7 +32,7 @@ public class Sinsei2Controller {
 	@RequestMapping(path = "/sinsei2", method = RequestMethod.POST)
 	public String sinsei2(Date kaisi, Date syuuryou, String ziyuu, Model model, HttpSession session) {
 	    try {
-	        if (kaisi.equals("") || syuuryou.equals("") || ziyuu.equals("")) {
+	        if (kaisi == null || syuuryou == null || ziyuu.equals("")) {
 	            return "sinseinull";
 	        } else {
 	            String x = (String) session.getAttribute("useID");
