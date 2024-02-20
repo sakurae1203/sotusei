@@ -61,7 +61,7 @@ public class Sinsei2Controller {
 
 	            jdbcTemplate.update("UPDATE 出勤 SET paid = ? WHERE userID = ?;", npl, x);
 
-	            return "sinsei1";
+	            return "redirect:/sinsei1";
 	        }
 	    } catch (Exception e) {
 	        System.out.println("データベースへのアクセスに失敗しました。");

@@ -53,8 +53,25 @@ public class SyuttaikinController {
 	//(ページ表示用メソッド)
 	@RequestMapping(path = "/syuttaikin", method = RequestMethod.GET)
 	public String syuttaikinGet(Model model) {
+		
+		Date toDay = new Date();
+		SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy/MM/dd");
+		String today = sdf1.format(toDay);
+		
+		try {
+		List<Map<String, Object>> resultList = jdbcTemplate
+				.queryForList(
+						"SELECT * FROM 社員 LEFT JOIN 出退勤 ON 社員.userID = 出退勤.userID LEFT JOIN 残業時間 ON 社員.userID = 残業時間.userID WHERE 出退勤.date = ? GROUP BY 社員.userID;",
+						today);
+		
+		model.addAttribute("resultList", resultList);
 
 		return "syuttaikin";
+		} catch (Exception e) {
+			System.out.println("データベースへのアクセスに失敗しました。");
+			e.printStackTrace();
+			return "dberror";
+		}
 
 	}
 

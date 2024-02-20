@@ -46,10 +46,12 @@ public class NissuuController {
 		for (int i = 0; i < result.size(); i++) {
 			nwd.add(String.valueOf(result.get(i).get("COUNT(*)")));
 		}
+		System.out.println(nwd.size());
 
 		//出勤日数登録(別のクラスに移したほうがよさそう)
 		List<Map<String, Object>> resultID = jdbcTemplate
 				.queryForList("SELECT * FROM 出勤;");
+		System.out.println(resultID.size());
 		for (int i = 0; i < resultID.size(); i++) {
 			userID = (String) resultID.get(i).get("userID");
 			
@@ -82,13 +84,5 @@ public class NissuuController {
 			return ChronoUnit.DAYS.between(fiscalYearStart, today) + 1; // 年度の開始日から今日までの日数を返す
 		}
 	}
-
-	//特に何もないメソッド(一応)
-	/*@RequestMapping(path = "/nissuu", method = RequestMethod.POST)
-	public String nissuu() throws ParseException {
-		
-		return "syuttaikin";
-	
-	}*/
 
 }

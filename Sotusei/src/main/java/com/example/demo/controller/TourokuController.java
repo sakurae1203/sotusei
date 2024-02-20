@@ -39,9 +39,9 @@ public class TourokuController {
 
 			System.out.println(ucount + "," + pcount + "," + ncount + "," + mcount);
 
-			if (useID == null && pass != null && name != null && mail != null) {
+			if (useID != null && pass != null && name != null && mail != null) {
 
-				if (ucount <= 16 && pcount <= 16 && ncount <= 30 && mcount <= 40) {
+				if (ucount <= 16 && pcount <= 16 && ncount <= 30 && mcount < 40) {
 
 					if (resultList.size() < 1) {
 
@@ -53,15 +53,18 @@ public class TourokuController {
 						zen.add(Calendar.DAY_OF_MONTH, -1);
 						now = zen.getTime();
 						String bday = sdf1.format(now);
+						
+						Date s = new Date();
+						Date e = new Date();
 
 						//DBに繋ぐならこんな感じ(JdbcTemplate)
 						jdbcTemplate.update("INSERT INTO 社員 VALUES (?,?,?,?);", useID, pass, name, mail);
 						jdbcTemplate.update("INSERT INTO ワンタイム VALUES (?,?);", mail, 0);
-						jdbcTemplate.update("INSERT INTO 残業時間 VALUES (?,?,?,?,?,?);", useID, useID + bday, bday, 0, 0,
+						jdbcTemplate.update("INSERT INTO 残業時間 VALUES (?,?,?,?,?,?,?);", useID, useID + bday, bday, 0, 0,
 								0, 0);
 						jdbcTemplate.update("INSERT INTO 出勤 VALUES (?,?,?,?);", useID, 0, 0, 0);
-						jdbcTemplate.update("INSERT INTO 出退勤 VALUES (?,?,?,?,?,?,?);", useID, 0, 0, 0, 0, 0, 0);
-						jdbcTemplate.update("INSERT INTO 有給 VALUES(?,?,?,?,?,?,?);", useID, 15, 0, 0000/00/00, 0000/00/00, 0, 0);
+						jdbcTemplate.update("INSERT INTO 出退勤 VALUES (?,?,?,?,?,?,?,?,?);", useID, 0, useID+0, 0, 0, 0, 0, 0, 0);
+						jdbcTemplate.update("INSERT INTO 有給 VALUES(?,?,?,?,?,?,?);", useID, 15, 0, s, e, 0, 0);
 						return "redirect:/login1";
 					} else {
 						return "tourokudualert";
