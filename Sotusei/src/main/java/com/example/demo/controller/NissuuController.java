@@ -28,6 +28,8 @@ public class NissuuController {
 		ArrayList<String> nwd = new ArrayList<>();
 
 		String userID;
+		
+		int ma;
 
 		//今日までの日数を計算(年度)
 		Date nD = new Date();
@@ -40,18 +42,17 @@ public class NissuuController {
 		if(MM < 4) {
 			yyyy--;
 		}
-		try {
+		//try {
 		//出勤日数カウント
 		List<Map<String, Object>> result = jdbcTemplate.queryForList("SELECT COUNT(*) FROM 出退勤 GROUP BY userID;");
 		for (int i = 0; i < result.size(); i++) {
-			nwd.add(String.valueOf(result.get(i).get("COUNT(*)")));
+			ma = Integer.parseInt(String.valueOf(result.get(i).get("COUNT(*)")))-1;
+			nwd.add(String.valueOf(ma));
 		}
-		System.out.println(nwd.size());
 
 		//出勤日数登録(別のクラスに移したほうがよさそう)
 		List<Map<String, Object>> resultID = jdbcTemplate
 				.queryForList("SELECT * FROM 出勤;");
-		System.out.println(resultID.size());
 		for (int i = 0; i < resultID.size(); i++) {
 			userID = (String) resultID.get(i).get("userID");
 			
@@ -62,13 +63,12 @@ public class NissuuController {
 
 		model.addAttribute("resultList", resultList);
 		
-
 		return "nissuu";
-    } catch (Exception e) {
+    /*} catch (Exception e) {
         System.out.println("DB接続失敗");
         e.printStackTrace();
         return "dberror";
-    }
+    }*/
 	}
 
 	public static long daysUntilTodayInFiscalYear(int fiscalYear) {
@@ -84,5 +84,13 @@ public class NissuuController {
 			return ChronoUnit.DAYS.between(fiscalYearStart, today) + 1; // 年度の開始日から今日までの日数を返す
 		}
 	}
+
+	//特に何もないメソッド(一応)
+	/*@RequestMapping(path = "/nissuu", method = RequestMethod.POST)
+	public String nissuu() throws ParseException {
+		
+		return "syuttaikin";
+	
+	}*/
 
 }
